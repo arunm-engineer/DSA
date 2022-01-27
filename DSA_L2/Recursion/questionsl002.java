@@ -1,6 +1,7 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class questionsl002 {
 
@@ -67,4 +68,37 @@ public class questionsl002 {
     }
 
     /******************************************************/ 
+
+    // https://www.interviewbit.com/old/problems/subset/
+    public ArrayList<ArrayList<Integer>> subsets(ArrayList<Integer> A) {
+        ArrayList<ArrayList<Integer>> ans = new ArrayList<>();
+        ArrayList<Integer> smallAns = new ArrayList<>();
+        
+        Collections.sort(A); // Have to sort to match output, nothing else
+        subsetHelper_subsq(A, 0, ans, smallAns);
+        return ans;
+    }
+    
+    public static int subsetHelper_subsq(ArrayList<Integer> list, int idx, ArrayList<ArrayList<Integer>> ans,
+    ArrayList<Integer> smallAns) {
+        ArrayList<Integer> copy = new ArrayList<>(smallAns);
+        ans.add(copy);
+        
+        if (idx == list.size())
+            return 1;
+        
+        int count = 0;
+
+        // nCr method
+        for (int i = idx;i < list.size();i++) {
+            smallAns.add(list.get(i));
+            count += subsetHelper_subsq(list, i+1, ans, smallAns);
+            smallAns.remove(smallAns.size()-1);
+        }
+        
+        return count;
+    }
+
+    /******************************************************/ 
+
 }
