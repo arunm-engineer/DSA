@@ -335,7 +335,8 @@ public class l001 {
         return ans;
     }
 
-    // -1 => fire node not found, -2 => fire can't be reached, time t > 0 => time for the node to burn
+    // -1 => fire node not found, -2 => fire can't be reached, time t > 0 => time
+    // for the node to burn
     public static int burningTree_02_Helper(TreeNode root, int target, ArrayList<ArrayList<Integer>> ans,
             HashSet<Integer> water) {
         if (root == null)
@@ -344,34 +345,51 @@ public class l001 {
             if (!water.contains(root.val)) {
                 kDown(root, 0, null, ans);
                 return 1;
-            }
-            return -2; // If the root is the both fire & water node
+            } else
+                return -2; // If the root is the both fire & water node
         }
 
         int l = burningTree_02_Helper(root.left, target, ans, water);
         if (l > 0) {
             if (!water.contains(root.val)) {
-                kDown(root, l, root.left, ans);
-                return l+1;
+                kDown_02(root, l, root.left, ans, water);
+                return l + 1;
             }
             return -2;
         }
-        if (l == -2) return -2; // Jump straight to main root without traversing rest of tree, since fire can't be reached here
-        
+        if (l == -2)
+            return -2; // Jump straight to main root without traversing rest of tree, since fire can't
+                       // be reached here
+
         int r = burningTree_02_Helper(root.right, target, ans, water);
         if (r > 0) {
             if (!water.contains(root.val)) {
-                kDown(root, r, root.right, ans);
-                return r+1;
+                kDown_02(root, r, root.right, ans, water);
+                return r + 1;
             }
             return -2;
         }
-        if (r == -2) return -2;
+        if (r == -2)
+            return -2;
 
         return -1;
     }
 
-    // Burning Tree Variation => Count no. of unburnt nodes, use same logic of burning tree & count burnt nodes first using return count from kDown function
+    public static void kDown_02(TreeNode root, int time, TreeNode blocker, ArrayList<ArrayList<Integer>> ans, HashSet<Integer> water) {
+        if (root == null || root == blocker || water.contains(root.val))
+            return;
+
+        if (time == ans.size())
+            ans.add(new ArrayList<Integer>());
+
+        ans.get(time).add(root.val);
+
+        kDown_02(root.left, time + 1, blocker, ans, water);
+        kDown_02(root.right, time + 1, blocker, ans, water);
+    }
+
+    // Burning Tree Variation => Count no. of unburnt nodes, use same logic of
+    // burning tree & count burnt nodes first using return count from kDown function
     // Then find total nodes in tree
     // Then unburnt nodes = total nodes - burnt nodes
 
