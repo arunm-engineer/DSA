@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 public class l001_TwoPointerSet {
 
     public static void display(int[] dp) {
@@ -209,6 +211,31 @@ public class l001_TwoPointerSet {
         return dp[N];
     }
 
+    // SC O(6) => Using Linked List
+    public static int boardPath_opt(int N) {
+        LinkedList<Integer> l = new LinkedList<>();
+        int sum = 0;
+
+        for (int n = 0; n <= N; n++) {
+            if (n <= 1) {
+                sum = 1;
+                l.add(sum);
+            } 
+            else if (n <= 6) {
+                int count = sum*2;
+                l.add(count);
+                sum = count;
+            }
+            else {
+                int count = sum*2 - l.removeFirst();
+                l.addLast(count);
+                sum = count;
+            }
+        }
+
+        return sum;
+    }
+
     public static int boardPathJumps_mem(int n, int[] dp, int[] jumps) {
         if (n == 0)
             return dp[n] = 1;
@@ -252,13 +279,14 @@ public class l001_TwoPointerSet {
         // System.out.println(boardPath_mem(n, dp));
         // System.out.println(boardPath_tab(n, dp));
         // System.out.println(boardPathJumps_mem(n, dp, jumps));
-        System.out.println(boardPathJumps_tab(n, dp, jumps));
+        // System.out.println(boardPathJumps_tab(n, dp, jumps));
         // display(dp);
+        // System.out.println(boardPath_opt(n));
     }
 
     public static void main(String[] args) {
         // fibonacci();
         // mazePath();
-        boardPath();
+        // boardPath();
     }
 }
