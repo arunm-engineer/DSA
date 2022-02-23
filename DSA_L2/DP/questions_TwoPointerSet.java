@@ -2,6 +2,19 @@ import java.util.Arrays;
 
 public class questions_TwoPointerSet {
 
+    public static void display(int[] dp) {
+        for (int ele : dp)
+            System.out.print(ele + " ");
+        System.out.println();
+    }
+
+    public static void display2D(int[][] dp) {
+        for (int[] arr : dp)
+            display(arr);
+    }
+
+    // ==============================================
+
     // LC 62
     public int uniquePaths(int m, int n) {
         int sr = 0, sc = 0, er = m - 1, ec = n - 1;
@@ -632,11 +645,109 @@ public class questions_TwoPointerSet {
 
     // ==============================================
 
-    public static void main(String[] args) {
-        int[][] grid = { { 1, 2, 3 },
-                        { 4, 8, 2 },
-                        { 1, 5, 3 } };
+    // https://www.geeksforgeeks.org/count-number-of-ways-to-partition-a-set-into-k-subsets/
+    public static int CountPartitionSetInKSubsets_mem(int n, int k, int[][] dp) {        
+        if (n == k) // Here n can only be split individually into exact k number of groups => 123 => [1,2,3]
+            return dp[n][k] = 1;
 
-        minCostPath(3, 3, grid);
+        if (k == 1) // Here let n be any no. of elems but can only form 1 group of all elems => 123 => [123]
+            return dp[n][k] = 1;
+
+        if (dp[n][k] != 0) // Here 0 never forms part of your answer
+            return dp[n][k];
+
+        int singleGroup = CountPartitionSetInKSubsets_mem(n-1, k-1, dp);
+        int anyGroup = CountPartitionSetInKSubsets_mem(n-1, k, dp) * k;
+        int count = singleGroup + anyGroup;
+
+        return dp[n][k] = count;
+    }
+
+    public static int CountPartitionSetInKSubsets_tab(int N, int K, int[][] dp) {
+        // Why n || k cannot start from 0, bcoz n elems cannot be in 0 groups (or) 0 elems cannot be in k groups
+        for (int n = 1; n <= N;n++) {
+            for (int k = 1; k <= K; k++) {
+                if (n == k) {
+                    dp[n][k] = 1;
+                    continue;
+                }
+
+                if (k == 1) {
+                    dp[n][k] = 1;
+                    continue;
+                }
+
+                int singleGroup = dp[n-1][k-1];
+                int anyGroup = dp[n-1][k] * k;
+                int count = singleGroup + anyGroup;
+
+                dp[n][k] = count;
+            }
+        }
+
+        return dp[N][K];
+    }
+
+    public static void CountPartitionSetInKSubsets() {
+        int n = 3, k = 2;
+        int[][] dp = new int[n+1][k+1];
+        // System.out.println(CountPartitionSetInKSubsets_mem(n, k, dp));
+        System.out.println(CountPartitionSetInKSubsets_tab(n, k, dp));
+        display2D(dp);
+    }
+
+
+    // ==============================================
+
+    // Question mismatched so this does not fall in current two pointer set of questions but still solved so can be referred just to learn this problem
+    // https://www.geeksforgeeks.org/count-the-number-of-ways-to-divide-n-in-k-groups-incrementally/
+    public static int divideNInKGroups_mem(int n, int k, int prev, int[][][] dp, String path) {
+        if (n == 0 && k == 0) {
+            System.out.println(path);
+            return dp[n][k][prev] = 1;
+        }
+        if (k == 0) 
+            return dp[n][k][prev] = 0;
+
+        if (dp[n][k][prev] != -1)
+            return dp[n][k][prev];
+
+        int count = 0;
+        for (int i = prev; i <= n; i++) {
+            if (n-i >= 0)
+                count += divideNInKGroups_mem(n-i, k-1, i, dp, path + i);
+            else
+                break;
+        }
+
+        return dp[n][k][prev] = count;
+    }
+
+    public static void divideInKGroups() {
+        int n = 8, k = 4, prev = 1;
+        int[][][] dp = new int[n+1][k+1][n+1];
+
+        for (int[][] arr1 : dp) {
+            for (int[] arr2 : arr1) {
+                Arrays.fill(arr2, -1);
+            }
+        }
+            
+        System.out.println(divideNInKGroups_mem(n, k, prev, dp, ""));
+    }
+
+    // ==============================================
+
+
+    // ==============================================
+
+    public static void main(String[] args) {
+        // int[][] grid = { { 1, 2, 3 },
+        //                 { 4, 8, 2 },
+        //                 { 1, 5, 3 } };
+
+        // minCostPath(3, 3, grid);
+        // divideInKGroups();
+        // CountPartitionSetInKSubsets();
     }
 }
