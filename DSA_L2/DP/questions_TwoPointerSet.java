@@ -647,17 +647,16 @@ public class questions_TwoPointerSet {
 
     // https://www.geeksforgeeks.org/count-number-of-ways-to-partition-a-set-into-k-subsets/
     public static int CountPartitionSetInKSubsets_mem(int n, int k, int[][] dp) {        
-        if (n == k) // Here n can only be split individually into exact k number of groups => 123 => [1,2,3]
-            return dp[n][k] = 1;
-
-        if (k == 1) // Here let n be any no. of elems but can only form 1 group of all elems => 123 => [123]
+        // Case (n == k) => Here n can only be split individually into exact k number of groups => 123 => [1,2,3]
+        // Case (k == 1) => Here let n be any no. of elems but can only form 1 group of all elems => 123 => [123]
+        if (n == k || k == 1) 
             return dp[n][k] = 1;
 
         if (dp[n][k] != 0) // Here 0 never forms part of your answer
             return dp[n][k];
 
         int singleGroup = CountPartitionSetInKSubsets_mem(n-1, k-1, dp);
-        int anyGroup = CountPartitionSetInKSubsets_mem(n-1, k, dp) * k;
+        int anyGroup = CountPartitionSetInKSubsets_mem(n-1, k, dp) * k; // ways * kgroups
         int count = singleGroup + anyGroup;
 
         return dp[n][k] = count;
@@ -667,12 +666,7 @@ public class questions_TwoPointerSet {
         // Why n || k cannot start from 0, bcoz n elems cannot be in 0 groups (or) 0 elems cannot be in k groups
         for (int n = 1; n <= N;n++) {
             for (int k = 1; k <= K; k++) {
-                if (n == k) {
-                    dp[n][k] = 1;
-                    continue;
-                }
-
-                if (k == 1) {
+                if (n == k || k == 1) {
                     dp[n][k] = 1;
                     continue;
                 }
