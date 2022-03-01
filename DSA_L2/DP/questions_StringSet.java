@@ -536,7 +536,7 @@ public class questions_StringSet {
                     else
                         ans = skipChar == 1;
                 }
-                else { // Both chars are different
+                else { // Both chars are not equal
                     ans = false;
                 }
 
@@ -687,8 +687,381 @@ public class questions_StringSet {
 
     // ===========================================
 
+    // LC 5 => [LPS] Longest Palindromic "Susbtring"
+    public String longestPalindrome(String s) {
+        int n = s.length();
+        boolean[][] dp = new boolean[n][n];
+        
+        return lps_tab(s, dp);
+    }
+    
+    public static String lps_tab(String str, boolean[][] dp) {
+        
+        int totalPalSubstr = 0; // Total number of LPS
+        int longestPalSusbtrLen = 0; // Length of LPS
+        String longestPalSubstr = ""; // Return the LPS itself
+        
+        // Gap strategy
+        int n = dp.length, m = dp[0].length;
+        for (int gap = 0; gap < m; gap++) {
+            for (int i = 0, j = gap; j < m; i++, j++) {
+                if (gap == 0)
+                    dp[i][j] = true;
+                else if (gap == 1 && str.charAt(i) == str.charAt(j))
+                    dp[i][j] = true;
+                else
+                    dp[i][j] = str.charAt(i) == str.charAt(j) && dp[i+1][j-1]; // Check in between substr also (i+1, j-1) for valid palindrome
+                
+                
+                if (dp[i][j] == true) {
+                    totalPalSubstr++;
+                    int len = (j-i) + 1;
+                    if (len > longestPalSusbtrLen) {
+                        longestPalSusbtrLen = len;
+                        longestPalSubstr = str.substring(i, j+1);
+                    }
+                }
+            }
+        }
+        
+        return longestPalSubstr;
+    }
+
+    // ===========================================
+
+    // LCS => Longest Commong "Substring"
+    // https://www.geeksforgeeks.org/longest-common-substring-dp-29/
+    public static int lcs_tab(String s1, String s2, int N, int M, int[][] dp) {
+        int maxLen = 0;
+        int ei = -1; // ending index
+
+        for (int n = 0; n <= N; n++) {
+            for (int m = 0; m <= M; m++) {
+                if (n == 0 || m == 0) {
+                    dp[n][m] = 0;
+                    continue;
+                }
+
+                int count = 0;
+                if (s1.charAt(n-1) == s2.charAt(m-1))
+                    count = 1 + dp[n-1][m-1];
+                else // (Si != Sj) ; Can skip this else, since by default value is 0
+                    count = 0;
+
+                dp[n][m] = count;
+                if (dp[n][m] > maxLen) {
+                    maxLen = dp[n][m];
+                    ei = n - 1; // This "n" represents for s1
+                }
+            }
+        }
+        
+        int si = ei - maxLen + 1;
+        String lcsubstr = s1.substring(si, ei+1); // To print Longest Common "Substring"
+        System.out.println(lcsubstr);
+
+        return maxLen;
+    }
+
+    // ===========================================
+
+    // LC 718 => Same LCS but instead of Strings we are given arrays
+    public int findLength(int[] nums1, int[] nums2) {
+        int n = nums1.length, m = nums2.length;
+        int[][] dp = new int[n+1][m+1];
+        
+        return lcs_tab(nums1, nums2, n, m, dp);
+    }
+    
+    public static int lcs_tab(int[] nums1, int[] nums2, int N, int M, int[][] dp) {
+        int maxLen = 0;
+        int ei = -1; // ending index
+
+        for (int n = 0; n <= N; n++) {
+            for (int m = 0; m <= M; m++) {
+                if (n == 0 || m == 0) {
+                    dp[n][m] = 0;
+                    continue;
+                }
+
+                int count = 0;
+                if (nums1[n-1] == nums2[m-1])
+                    count = 1 + dp[n-1][m-1];
+                else // (Si != Sj) ; Can skip this else, since by default value is 0
+                    count = 0;
+
+                dp[n][m] = count;
+
+                maxLen = Math.max(dp[n][m], maxLen);
+            }
+        }
+        
+        return maxLen;
+    }
+
+    // ===========================================
+
+    // LC 583 => Used ditto copy/paste of already solved questions concept
+    public int minDistance_03(String word1, String word2) {
+        int n = word1.length(), m = word2.length();
+        int[][] dp = new int[n+1][m+1];
+        for (int[] arr : dp)
+            Arrays.fill(arr, -1);
+        
+        // Solution 1:
+        // int lcssLen = lcss_tab_01(word1, word2, n, m, dp);
+        // Why 2 times bcoz we match and delete lcss from the totalString and remaining is the ans
+        // int ans = (n+m) - (2*lcssLen); // Add 2 strings len => TotalLen - 2*lcssLen
+        
+        // Solution 2:
+        // Can also try this edit Distance Approach, since both lcss and editDistance are kind of interlinked concepts
+        int ans = editDistance_tab_01(word1, word2, n, m, dp);
+        return ans;
+    }
+    
+    public static int editDistance_tab_01(String s1, String s2, int N, int M, int[][] dp) {
+        for (int n = 0; n <= N; n++) {
+            for (int m = 0; m <= M; m++) {
+                if (n == 0 || m == 0) {
+                    dp[n][m] = (n == 0 ? m : n);
+                    continue;
+                }
+
+                int count = 0;
+                if (s1.charAt(n-1) == s2.charAt(m-1)) {
+                    count = dp[n-1][m-1];
+                }
+                else {
+                    int insert = dp[n][m-1];
+                    int delete = dp[n-1][m];
+                    // int replace = dp[n-1][m-1]; // Just don't need "replace" option here
+                    // Here added 1 for any one operation performed here (i, d)
+                    count = Math.min(insert, delete) + 1;
+                }
+
+                dp[n][m] = count;
+            }
+        }
+        
+        return dp[N][M];
+    }
+    
+    public static int lcss_tab_01(String s1, String s2, int N, int M, int[][] dp) {
+        for (int n = 0; n <= N; n++) {
+            for (int m = 0; m <= M; m++) {
+                if (n == 0 || m == 0) {
+                    dp[n][m] = 0;
+                    continue;
+                }
+
+                int count = 0;
+                if (s1.charAt(n-1) == s2.charAt(m-1))
+                    count = 1 + dp[n-1][m-1];
+                else 
+                    count = Math.max(dp[n-1][m], dp[n][m-1]);
+
+                dp[n][m] = count;
+            }
+        }
+        
+        return dp[N][M];
+    }
+
+    // ===========================================
+
+    // LC 132
+    // Testcase => "fafaaabaageeg"
+    public int minCut(String s) {
+        int n = s.length();
+        boolean[][] palDP = new boolean[n][n];
+        
+        // LPS logic => First pre-process and find all palindromic substrings
+        int m = palDP[0].length;
+        for (int gap = 0; gap < m; gap++) {
+            for (int i = 0, j = gap; j < m; i++, j++) {
+                if (gap == 0)
+                    palDP[i][j] = true;
+                else if (gap == 1 && s.charAt(i) == s.charAt(j))
+                    palDP[i][j] = true;
+                else
+                    palDP[i][j] = s.charAt(i) == s.charAt(j) && palDP[i+1][j-1];
+            }
+        }
+        
+        // Now to find the minCut on the string
+        int[] dp = new int[n]; // This dp is to store minCuts from every points of pal cut
+        Arrays.fill(dp, -1);
+        
+        // int minCutAns = palPartition_mem(s, 0, n-1, dp, palDP);
+        int minCutAns = palPartition_tab(s, 0, n-1, dp, palDP);
+        return minCutAns;
+    } 
+    
+    public static int palPartition_mem(String str, int si, int ei, int[] dp, boolean[][] palDP) {
+        if (palDP[si][ei]) // Base case is pal string (even for 1 length string is pal)
+            return dp[si] = 0;
+        
+        if (dp[si] != -1)
+            return dp[si];
+        
+        int minCutAns = (int) 1e9;
+        for (int cut = si; cut <= ei; cut++) {
+            if (palDP[si][cut]) 
+                minCutAns = Math.min(minCutAns, palPartition_mem(str, cut+1, ei, dp, palDP) + 1);
+        }
+        
+        return dp[si] = minCutAns;
+    }
+    
+    public static int palPartition_tab(String str, int SI, int EI, int[] dp, boolean[][] palDP) {
+        for (int si = EI; si >= SI; si--) {
+            if (palDP[si][EI]) {
+                dp[si] = 0;
+                continue;
+            }
+
+            int minCutAns = (int) 1e9;
+            for (int cut = si; cut <= EI; cut++) {
+                if (palDP[si][cut]) 
+                    minCutAns = Math.min(minCutAns, dp[cut+1] + 1);
+
+                dp[si] = minCutAns;
+            }
+        }
+        
+        return dp[SI];
+    }
+
+    // ===========================================
+
+    // https://www.geeksforgeeks.org/number-subsequences-form-ai-bj-ck/
+    // Count Subsequences of pattern a^i, b^j, c^k
+    public int countSubsq(String s) {
+        int mod = (int) 1e9 + 7;
+        int n = s.length();
+        long empty = 1, aCount = 0, bCount = 0, cCount = 0;
+        
+        for (int i = 0; i < n; i++) {
+            char ch = s.charAt(i);
+            
+            if (ch == 'a') 
+                aCount = ((aCount) + (empty+aCount)) % mod; // No + Yes
+            
+            if (ch == 'b') 
+                bCount = ((bCount) + (aCount+bCount)) % mod; // No + Yes
+                
+            if (ch == 'c')
+                cCount = ((cCount) + (bCount+cCount)) % mod; // No + Yes
+        }
+        
+        return (int) cCount;
+    }
+
+    // Follow Up question to above question => https://www.geeksforgeeks.org/number-subsequences-form-ai-bj-ck/
+    // Testcase (a-f chars)=> a^i, b^j, c^k, d^l, e^m, f^n
+    public static int countSubsq_01(String s) {
+        int mod = (int) 1e9 + 7;
+        int n = s.length();
+        long empty = 1;
+        long[] arr = new long[6];
+        
+        for (int i = 0; i < n; i++) {
+            char ch = s.charAt(i);
+            
+            if (ch == 'a') 
+                arr[ch-'a'] = arr[ch-'a'] + (empty + arr[ch-'a']) % mod; // No + Yes
+            else 
+                arr[ch-'a'] = arr[ch-'a'] + ((arr[ch-'a'-1]) + arr[ch-'a']) % mod; // No + Yes
+        }
+        
+        return (int) arr[arr.length-1] % mod;
+    }
+
+    // ===========================================
+
+    // LC 1278
+    public int palindromePartition(String s, int k) {
+        int n = s.length();
+        int[][] palDP = new int[n][n]; // This DP stores minSteps to convert substr to a palindrome
+        
+        // LPS logic => Min steps to convert substr to a palindrome
+        int m = palDP[0].length;
+        for (int gap = 0; gap < m; gap++) {
+            for (int i = 0, j = gap; j < m; i++, j++) {
+                if (gap == 0)
+                    palDP[i][j] = 0;
+                else if (gap == 1) {
+                    if (s.charAt(i) == s.charAt(j)) palDP[i][j] = 0;
+                    else palDP[i][j] = 1;
+                }
+                else {
+                    if (s.charAt(i) == s.charAt(j)) palDP[i][j] = palDP[i+1][j-1];
+                    else palDP[i][j] = 1 + palDP[i+1][j-1];
+                }
+            }
+        }
+        
+        int[][] dp = new int[n][k+1]; // This dp is to store minCuts from every points of pal cut
+        for (int[] a : dp)
+            Arrays.fill(a, -1);
+        
+        // int minSteps = palPartition_03_mem(s, 0, n-1, k, dp, palDP);
+        int minSteps = palPartition_03_tab(s, 0, n-1, k, dp, palDP);
+        return minSteps;
+    }
+    
+    public static int palPartition_03_mem(String s, int si, int ei, int k, int[][] dp, int[][] palDP) {
+        if (k == 1)
+            return dp[si][k] = palDP[si][ei];
+        
+        if (dp[si][k] != -1)
+            return dp[si][k];
+        
+        int minSteps = (int) 1e9;
+        for (int cut = si; cut <= ei; cut++) {
+            if (cut + 1 <= ei) { // To save from IndexOutOfBounds
+                int currSteps = palDP[si][cut] + palPartition_03_mem(s, cut+1, ei, k-1, dp, palDP);
+                minSteps = Math.min(minSteps, currSteps);
+            }
+        }
+        
+        return dp[si][k] = minSteps;
+    }
+    
+    public static int palPartition_03_tab(String s, int SI, int EI, int K, int[][] dp, int[][] palDP) {
+        for (int si = EI; si >= SI; si--) {
+            for (int k = K; k > 0; k--) {
+                if (k == 1) {
+                    dp[si][k] = palDP[si][EI];                
+                    continue;
+                }
+
+                int minSteps = (int) 1e9;
+                for (int cut = si; cut <= EI; cut++) {
+                    if (cut + 1 <= EI) { // To save from IndexOutOfBounds
+                        int currSteps = palDP[si][cut] + dp[cut+1][k-1]; // steps(si,cut) + steps(cut+1,ei)
+                        minSteps = Math.min(minSteps, currSteps);
+                    }
+                }
+
+                dp[si][k] = minSteps;
+            }
+        }
+        
+        return dp[SI][K];
+    }
+
+    // ===========================================
+
     public static void main(String[] args) {
-        System.out.println(minDistance_01("a", "b"));
+        // System.out.println(minDistance_01("a", "b"));
         // System.out.println(minDistance_02("a", "b"));
+
+        // String s1 = "abcdxyzfr", s2 = "xyzabcd";
+        // int n = s1.length(), m = s2.length();
+        // int[][] dp = new int[n+1][m+1];
+        // System.out.println(lcs_tab(s1, s2, n, m, dp));
+
+        // System.out.println(countSubsq_01("abcdeff"));
     }
 }
