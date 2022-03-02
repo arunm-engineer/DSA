@@ -469,6 +469,9 @@ public class questions_TwoPointerSet {
         for (int i = 0; i < grid.length; i++)
             maxGold = Math.max(maxGold, dp[i][0]);
 
+        display2D(dp);
+        goldmine_BackEng(dp);
+
         return maxGold;
     }
 
@@ -527,7 +530,8 @@ public class questions_TwoPointerSet {
 
         // System.out.println(minCostPath_mem(0, 0, grid, dir, dp));
         System.out.println(minCostPath_tab(0, 0, grid, dir, dp));
-
+        display2D(dp);
+        minCost_BackEng(dp);
     }
 
     public static int minCostPath_mem(int sr, int sc, int[][] grid, int[][] dir, int[][] dp) {
@@ -732,16 +736,83 @@ public class questions_TwoPointerSet {
 
     // ==============================================
 
+    // =============================Back Engineering Concept===========================
+    public static void goldmine_BackEng(int[][] dp) {
+        int sr = -1, sc = 0; // To get the start points
+        int max = -(int) 1e9;
+        for (int i = 0;i < dp.length;i++) {
+            if (dp[i][sc] > max) {
+                max = dp[i][sc];
+                sr = i;
+            }
+        }
+
+        int[][] dir = {{-1, 1}, {0, 1}, {1, 1}};
+        System.out.println(goldmine_BackEng(sr, sc, dp, dir));
+    }
+
+    public static String goldmine_BackEng(int sr, int sc, int[][] dp, int[][] dir) {
+        if (sc == dp[0].length-1) 
+            return " -> (" + sr + ", " + sc  + ")";
+
+        int SR = -1, SC = -1, max = -(int) 1e9;
+        for (int d = 0; d < dir.length; d++) {
+            int r = sr + dir[d][0];
+            int c = sc + dir[d][1];
+
+            if (r >= 0 && r <= dp.length-1 && c >= 0 && c <= dp[0].length-1) {
+                if (dp[r][c] > max) {
+                    max = dp[r][c];
+                    SR = r;
+                    SC = c;
+                }
+            }
+        }
+
+        String recAns = goldmine_BackEng(SR, SC, dp, dir);
+        return " -> (" + sr + ", " + sc  + ")" + recAns;
+    }
 
     // ==============================================
 
-    public static void main(String[] args) {
-        // int[][] grid = { { 1, 2, 3 },
-        //                 { 4, 8, 2 },
-        //                 { 1, 5, 3 } };
+    public static void minCost_BackEng(int[][] dp) {
+        int sr = 0, sc = 0;
+        int[][] dir = {{0, 1}, {1, 1}, {1, 0}};
 
-        // minCostPath(3, 3, grid);
+        System.out.println(minCost_BackEng(sr, sc, dp, dir));
+    }
+
+    public static String minCost_BackEng(int sr, int sc, int[][] dp, int[][] dir) {
+        if (sr == dp.length-1 && sc == dp[0].length-1)
+            return " -> (" + sr + ", " + sc  + ")";
+
+        int SR = -1, SC = -1, min = (int) 1e9;
+        for (int d = 0; d < dir.length; d++) {
+            int r = sr + dir[d][0];
+            int c = sc + dir[d][1];
+
+            if (r >= 0 && r <= dp.length-1 && c >= 0 && c <= dp[0].length-1) {
+                if (dp[r][c] < min) {
+                    min = dp[r][c];
+                    SR = r;
+                    SC = c;
+                }
+            }
+        }
+
+        String recAns = minCost_BackEng(SR, SC, dp, dir);
+        return " -> (" + sr + ", " + sc  + ")" + recAns;
+    }
+
+    public static void main(String[] args) {
+        int[][] grid = { {1, 2, 3},
+                        {4, 8, 2},
+                        {1, 5, 3}};
+        int n = grid.length, m = grid[0].length;
+        
+        // minCostPath(n, m, grid);
         // divideInKGroups();
         // CountPartitionSetInKSubsets();
+        // maxGold(n, m, grid);
     }
 }
