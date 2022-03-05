@@ -284,14 +284,14 @@ public class l003LIS {
     public static void lis_tab_end_001(int[] nums, int[] dp) {
         int n = nums.length;
         for (int ei = 0; ei < n; ei++) {
-            int maxLen = nums[ei];
+            int maxSum = nums[ei];
             for (int i = ei-1; i >= 0; i--) {
                 if (nums[i] < nums[ei]) {
-                    maxLen = Math.max(maxLen, dp[i] + nums[ei]);
+                    maxSum = Math.max(maxSum, dp[i] + nums[ei]);
                 }
             }
             
-            dp[ei] = maxLen;
+            dp[ei] = maxSum;
         }
     }
     
@@ -300,23 +300,152 @@ public class l003LIS {
     public static void lds_tab_start_001(int[] nums, int[] dp) { 
         int n = nums.length;
         for (int ei = n-1; ei >= 0; ei--) {
-            int maxLen = nums[ei];
+            int maxSum = nums[ei];
             for (int i = ei+1; i < n; i++) {
                 if (nums[i] < nums[ei]) {
-                    maxLen = Math.max(maxLen, dp[i] + nums[ei]);
+                    maxSum = Math.max(maxSum, dp[i] + nums[ei]);
                 }
             }
             
-            dp[ei] = maxLen;
+            dp[ei] = maxSum;
         }
     }
 
     // ===========================================
     
+    // Minimum delete operations to make array into sorted
+    // Testcase => [2,2,2,3,1] = 1 ; [1,3,2,1,5] = 2
+    public static int lis_tab_002(int[] nums, int[] dp) {
+        int n = nums.length, lisLen = 0;
+        for (int ei = 0; ei < n; ei++) {
+            int maxLen = 1;
+            for (int i = ei-1; i >= 0; i--) {
+                if (nums[i] <= nums[ei]) { // <= to include duplicates also
+                    maxLen = Math.max(maxLen, dp[i] + 1);
+                }
+            }
+            
+            dp[ei] = maxLen;
+            lisLen = Math.max(lisLen, dp[ei]);
+        }
+        
+        int minDel = nums.length - lisLen;
+        return minDel;
+    }
+
+    // ===========================================
+
+    // LC 673
+    public int findNumberOfLIS(int[] nums) {
+        int n = nums.length;
+        int[] lis_dp = new int[n];
+        return lis_tab(nums, lis_dp);
+    }
+    
+    public static int lis_tab_003(int[] nums, int[] len_dp) {
+        int n = nums.length, maxLen = 0, maxCount = 0;
+        
+        int[] count_dp = new int[n];
+        for (int ei = 0; ei < n; ei++) {
+            len_dp[ei] = 1;
+            count_dp[ei] = 1;
+            for (int i = ei-1; i >= 0; i--) {
+                if (nums[i] < nums[ei]) {
+                    if (len_dp[i] + 1 > len_dp[ei]) { // if prevLen+1 > curLen => new len, count
+                        len_dp[ei] = len_dp[i] + 1;
+                        count_dp[ei] = count_dp[i];
+                    } 
+                    else if (len_dp[i]+1 == len_dp[ei]) { // if prevLen+1 == curLen => update count
+                        count_dp[ei] += count_dp[i];
+                    }
+                }
+            }
+            
+            if (len_dp[ei] > maxLen) {
+                maxLen = len_dp[ei];
+                maxCount = count_dp[ei];
+            } 
+            else if (len_dp[ei] == maxLen) {
+                maxCount += count_dp[ei];
+            }
+        }
+
+        return maxCount;
+    }
+
+    // ===========================================
+
+    // https://www.geeksforgeeks.org/dynamic-programming-building-bridges/
+    // Testcase [[8,1], [2,3], [1,4], [5,2], [6,7], [7,5], [3,8], [4,6]]
+    public static int buildingBridges(int[][] arr) {
+        // arr[i][0] => start pt., arr[i][1] => end pt.
+        // Sort my end pt.s and have ensured that end pt.s are in increasing order and will never overlap
+        Arrays.sort(arr, (a, b) -> {
+            return a[1] - b[1];
+        });
+
+        // Now find LIS in start pt.s, thereby both being in increasing order the bridges may never overlap
+        int n = arr.length, maxLen = 0;
+        int[] dp = new int[n];
+        for (int ei = 0; ei < n; ei++) {
+            dp[ei] = 1;
+            for (int i = ei-1; i >= 0; i--) {
+                // same st, end pt.s allowed ">=", same st, end not allowed ">" => if (arr[ei][0] > arr[i][0] && arr[ei][1] > arr[i][1])
+                if (arr[ei][0] >= arr[i][0]) { 
+                    dp[ei] = Math.max(dp[ei], dp[i] + 1);
+                }
+            }
+            maxLen = Math.max(maxLen, dp[ei]);
+        }
+
+        return maxLen;
+    }
+
+    // ===========================================
+
+    // LC 354
+    // Buiding Brides GFG variant => Correct solution below but TLE since TC = O(n^2)
+    // So we need to apply nlogn solution of LIS to pass this code => nlogn of LIS will be covered in Searching Sorting
+    public int maxEnvelopes(int[][] envelopes) {
+        return maxEnvelopes_00(envelopes);
+    }
+    
+    public static int maxEnvelopes_00(int[][] arr) {
+        // Sort ht. and have ensured that ht. are in increasing order and will never overlap
+        Arrays.sort(arr, (a, b) -> {
+            return a[1] - b[1];
+        });
+
+        // Now find LIS in wd., thereby both being in increasing order the bridges may never overlap
+        int n = arr.length, maxLen = 0;
+        int[] dp = new int[n];
+        for (int ei = 0; ei < n; ei++) {
+            dp[ei] = 1;
+            for (int i = ei-1; i >= 0; i--) {
+                // same wd., ht. not allowed, so strictly ">"
+                if (arr[ei][0] > arr[i][0] && arr[ei][1] > arr[i][1]) { 
+                    dp[ei] = Math.max(dp[ei], dp[i] + 1);
+                }
+            }
+            maxLen = Math.max(maxLen, dp[ei]);
+        }
+
+        return maxLen;
+    }
+
+    // ===========================================
 
     public static void main(String[] args) {
         int[] nums = {1, 11, 2, 10, 4, 5, 2, 1, 20};
         // lengthOfLDS(nums);
+
         // LongestBitonicSequence(nums);
+
+        // int[] dp = new int[nums.length];
+        // lis_tab_002(nums, dp);
+
+        // int[][] arr = {{8,1}, {2,3}, {1,4}, {5,2}, {6,7}, {7,5}, {3,8}, {4,6}};
+        // buildingBridges(arr);
+
     }
 }
