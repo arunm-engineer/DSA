@@ -494,6 +494,91 @@ public class l004_Target {
     }
 
     // ===================================================
+
+    // LC 494
+    public int findTargetSumWays(int[] nums, int target) {
+        int sum = 0;
+        for (int ele : nums)
+            sum += ele;
+        
+        if (target > sum || target < -sum) 
+            return 0;
+        
+        int n = nums.length;
+        return targetSum_rec(nums, n, target);
+    }
+    
+    public static int targetSum_rec(int[] nums, int n, int tar) {
+        if (n == 0) // Since every values of nums has to be used either +ve or -ve
+            return tar == 0 ? 1 : 0;
+        
+        int count = 0;
+        count += targetSum_rec(nums, n - 1, tar - nums[n-1]); // +ve
+        count += targetSum_rec(nums, n - 1, tar - (-nums[n-1])); // -ve
+        
+        return count;
+    }
+
+    public int findTargetSumWays_01(int[] nums, int target) {
+        int sum = 0;
+        for (int ele : nums)
+            sum += ele;
+        
+        if (target > sum || target < -sum) 
+            return 0;
+        
+        int n = nums.length;
+        int[][] dp = new int[n+1][2*sum+1];
+        for (int[] a : dp)
+                Arrays.fill(a, -1);
+        
+        return targetSum_mem_01(nums, n, target+sum, sum, dp);
+    }
+    
+    // From tar to 0(here 0 acts as sum because of shifted indexes)
+    public static int targetSum_mem_01(int[] nums, int n, int tar, int sum, int[][] dp) {
+        if (n == 0) // Since every values of nums has to be used either +ve or -ve
+            return dp[n][tar] = tar == sum ? 1 : 0;
+        
+        if (dp[n][tar] != -1)
+            return dp[n][tar];
+        
+        int count = 0;
+        if (tar - nums[n-1] >= 0) count += targetSum_mem_01(nums, n - 1, tar - nums[n-1], sum, dp); // +ve
+        if (tar - (-nums[n-1]) <= 2*sum) count += targetSum_mem_01(nums, n - 1, tar - (-nums[n-1]), sum, dp); // -ve
+        
+        return dp[n][tar] = count;
+    }
+
+    public int findTargetSumWays_02(int[] nums, int target) {
+        int sum = 0;
+        for (int ele : nums) sum += ele;
+        if (target > sum || target < -sum) return 0;
+        
+        int n = nums.length;
+        int[][] dp = new int[n+1][2*sum+1];
+        for (int[] a : dp)
+                Arrays.fill(a, -1);
+        
+        return targetSum_mem_02(nums, n, sum, sum+target, dp);
+    }
+    
+    // From 0(here 0 acts as the sum because of shifted indexes) to tar
+    public static int targetSum_mem_02(int[] nums, int n, int sum, int tar, int[][] dp) {
+        if (n == 0) // Since every values of nums has to be used either +ve or -ve
+            return dp[n][sum] = sum == tar ? 1 : 0;
+        
+        if (dp[n][sum] != -1)
+            return dp[n][sum];
+        
+        int count = 0;
+        count += targetSum_mem_02(nums, n - 1, sum + nums[n-1], tar, dp); // +ve
+        count += targetSum_mem_02(nums, n - 1, sum - nums[n-1], tar, dp); // -ve
+        
+        return dp[n][sum] = count;
+    }
+
+    // ===================================================
     
     
     public static void main(String[] args) {
