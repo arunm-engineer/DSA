@@ -461,7 +461,7 @@ public class l004_Target {
             sum += num;
         
         // We cant find a subset for "odd" sum, since half of odd sum will be decimal val, for which subset cannot exist
-        if (sum%2 != 0) 
+        if (sum%2 != 0) // Why %2, because we are finding 2-partitions, if k-partitions, then %k
             return false;
         
         // We now only need to find the subset for next half to equal sum/2 which together forms "sum"
@@ -532,7 +532,8 @@ public class l004_Target {
         for (int[] a : dp)
                 Arrays.fill(a, -1);
         
-        return targetSum_mem_01(nums, n, target+sum, sum, dp);
+        // return targetSum_mem_01(nums, n, target+sum, sum, dp);
+        return targetSum_tab_01(nums, n, target+sum, sum, dp);
     }
     
     // From tar to 0(here 0 acts as sum because of shifted indexes)
@@ -550,7 +551,25 @@ public class l004_Target {
         return dp[n][tar] = count;
     }
 
-    public int findTargetSumWays_02(int[] nums, int target) {
+    public static int targetSum_tab_01(int[] nums, int N, int TAR, int SUM, int[][] dp) {
+        for (int n = 0; n <= N; n++) {
+            for (int tar = 0; tar < dp[0].length; tar++) {
+                if (n == 0) {
+                    dp[n][tar] = tar == SUM ? 1 : 0;                    
+                    continue;
+                }
+
+                int count = 0;
+                if (tar - nums[n-1] >= 0) count += dp[n-1][tar - nums[n-1]];
+                if (tar - (-nums[n-1]) <= 2*SUM) count += dp[n-1][tar - (-nums[n-1])];
+                dp[n][tar] = count;
+            }
+        }
+        
+        return dp[N][TAR];
+    }
+
+    public static int findTargetSumWays_02(int[] nums, int target) {
         int sum = 0;
         for (int ele : nums) sum += ele;
         if (target > sum || target < -sum) return 0;
@@ -560,13 +579,15 @@ public class l004_Target {
         for (int[] a : dp)
                 Arrays.fill(a, -1);
         
-        return targetSum_mem_02(nums, n, sum, sum+target, dp);
+        int ans = targetSum_mem_02(nums, n, sum, sum+target, dp);
+        display2D(dp);
+        return ans;
     }
     
     // From 0(here 0 acts as the sum because of shifted indexes) to tar
     public static int targetSum_mem_02(int[] nums, int n, int sum, int tar, int[][] dp) {
         if (n == 0) // Since every values of nums has to be used either +ve or -ve
-            return dp[n][sum] = sum == tar ? 1 : 0;
+            return dp[n][sum] = tar == sum ? 1 : 0;
         
         if (dp[n][sum] != -1)
             return dp[n][sum];
@@ -579,15 +600,146 @@ public class l004_Target {
     }
 
     // ===================================================
+
+    // LC 698 
+    public boolean canPartitionKSubsets(int[] nums, int k) {
+        int sum = 0, maxEle = 0;
+        for (int ele : nums) {
+            sum += ele;
+            maxEle = Math.max(maxEle, ele);
+        }
+        
+        // %k => for k-partitions subset && /k => maxelem should not be > than sum/k
+        // Think on this Testcase for k-partitions => nums = [2,2,2,2,1,3], k = 6
+        if (sum%k != 0 || maxEle > sum/k) return false;
+        
+        int n = nums.length, tar = sum/k;
+        boolean[] vis = new boolean[n];
+        return kEqualSumSubset(nums, 0, k, 0, tar, vis);
+    }
+    
+    public static boolean kEqualSumSubset(int[] nums, int idx, int k, int sumSF, int tar, boolean[] vis) {
+        if (k == 0) return true; // We have found all k equal sum subsets
+        if (sumSF > tar) return false;
+        
+        // Found one subset of equal sum now we further call for k-1 equal sum subset
+        if (tar == sumSF) 
+            return kEqualSumSubset(nums, 0, k-1, 0, tar, vis);
+        
+        boolean res = false;
+        for (int i = idx; i < nums.length; i++) {
+            if (vis[i] == true) continue;
+            
+            vis[i] = true;
+            res = res || kEqualSumSubset(nums, i+1, k, sumSF + nums[i], tar, vis);
+            vis[i] = false;
+        }
+        
+        return res;
+    }
+
+    // Correct approach but TLE
+    public boolean canPartitionKSubsets_01(int[] nums, int k) {
+        int n = nums.length;
+        int[] KSumArr = new int[k];
+        
+        return KEqualSumSubset_01(nums, n, KSumArr, k);
+    }
+    
+    public static boolean KEqualSumSubset_01(int[] nums, int n, int[] KSumArr, int k) {
+        if (n == 0) {
+            for (int j = 1; j < k; j++) {
+                if (KSumArr[j] != KSumArr[j-1])
+                    return false;
+            }
+            
+            return true;
+        }
+        
+        boolean res = false;
+        for (int i = 0; i < k; i++) {
+            KSumArr[i] += nums[n-1];
+            res = res || KEqualSumSubset_01(nums, n-1, KSumArr, k);
+            KSumArr[i] -= nums[n-1];
+        }
+        
+        return res;
+    }
+
+    // ===================================================
+
+    // LC 688
+    public double knightProbability(int n, int k, int row, int column) {
+        int dx[] = { 2, 1, -1, -2, -2, -1, 1, 2 };
+        int dy[] = { 1, 2, 2, 1, -1, -2, -2, -1 };
+        
+        double[][][] dp = new double[k+1][n+1][n+1];
+        for (double[][] a : dp)
+            for (double[] b : a)
+                Arrays.fill(b, -1.0);
+        
+        // return knightProbability_mem(n, k, row, column, dx, dy, dp);
+        return knightProbability_tab(n, k, row, column, dx, dy, dp);
+    }
+    
+    public static double knightProbability_mem(int n, int k, int sr, int sc, int[] dx, int[] dy, double[][][] dp) {
+        if (k == 0)
+            return dp[k][sr][sc] = 1.0;
+        
+        if (dp[k][sr][sc] != -1.0)
+            return dp[k][sr][sc];
+        
+        double count = 0.0;
+        for (int d = 0; d < 8; d++) {
+            int r = sr + dx[d];
+            int c = sc + dy[d];
+            
+            if (r >= 0 && c >= 0 && r < n && c < n) 
+                count += knightProbability_mem(n, k-1, r, c, dx, dy, dp); // Safe move within board, so k-1
+        }
+        
+        // Why /8.0 => bcoz we explore 8 directions and for every 8-paths we have to find probability => /8.0
+        return dp[k][sr][sc] = count/8.0;
+    }
+
+    public static double knightProbability_tab(int n, int K, int SR, int SC, int[] dx, int[] dy, double[][][] dp) {
+        for (int k = 0; k <= K; k++) {
+            for (int sr = 0; sr < n; sr++) { // Here in this case, we have to get sr, sc start from 0 to n
+                for (int sc = 0; sc < n; sc++) {
+                    if (k == 0) {
+                        dp[k][sr][sc] = 1.0;                        
+                        continue;
+                    }
+
+                    double count = 0.0;
+                    for (int d = 0; d < 8; d++) {
+                        int r = sr + dx[d];
+                        int c = sc + dy[d];
+
+                        if (r >= 0 && c >= 0 && r < n && c < n) 
+                            count += dp[k-1][r][c];
+                    }
+
+                    dp[k][sr][sc] = count/8.0;
+                }
+            }
+        }
+        
+        return dp[K][SR][SC];
+    }
+
+    // ===================================================
     
     
     public static void main(String[] args) {
         // Target();
         
-        int N = 3, sum = 4;
-        int[] arr = {2, 2, 3};
+        // int N = 3, sum = 4;
+        // int[] arr = {2, 2, 3};
         // isSubsetSum(N, arr, sum);
-        int[] dp = new int[sum+1];
-        System.out.println(infiniteComb_opt_01(arr, N-1, sum, dp));
+        // int[] dp = new int[sum+1];
+        // System.out.println(infiniteComb_opt_01(arr, N-1, sum, dp));
+
+        System.out.println(findTargetSumWays_02(new int[]{1,1,1,1,1}, 3));
     }
 }
