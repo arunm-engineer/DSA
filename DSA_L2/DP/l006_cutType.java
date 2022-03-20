@@ -479,6 +479,50 @@ public class l006_cutType {
 
     // ===================================================
 
+    // https://www.geeksforgeeks.org/mobile-numeric-keypad-problem/
+    public long getCount(int N) {
+		int n = 4, m = 3; // Representation of rows and cols in a mobile keypad
+		int k = N; // moves i.e. num of keys
+		int[][] dir = { {0, 0}, {-1, 0}, {0, 1}, {1, 0}, {0, -1} }; // Why {0, 0} since we can press same button N times as well ; N = 2 => 11, 22, 33, 44
+		long[][][] dp = new long[n][m][k+1];
+		for (long[][] a : dp) {
+            for (long[] b : a)
+                Arrays.fill(b, -1);
+        }
+		
+		long count = 0;
+		for (int sr = 0; sr < n; sr++) {
+		    for (int sc = 0; sc < m; sc++) {
+		        if (!(sr == n-1 && sc == 0) && !(sr == n-1 && sc == m-1)) // Should not be '*' or '#'
+		            count += getCount_mem(n, m, sr, sc, k, dir, dp);
+		    }
+		}
+		
+		return count;
+	}
+	
+    // 3D DP
+	public static long getCount_mem(int n, int m, int sr, int sc, int k, int[][] dir, long[][][] dp) {
+	    if (k == 1)
+	        return dp[sr][sc][k] = 1;
+	        
+	    if (dp[sr][sc][k] != -1)
+	        return dp[sr][sc][k];
+	        
+	    long count = 0;
+	    for (int d = 0; d < dir.length; d++) {
+	        int r = sr + dir[d][0];
+	        int c = sc + dir[d][1];
+	        
+	        if (r >= 0 && c >= 0 && r < n && c < m && !(r == n-1 && c == 0) && !(r == n-1 && c == m-1))
+	            count += getCount_mem(n, m, r, c, k-1, dir, dp);
+	    }
+	    
+	    return dp[sr][sc][k] = count;
+    }
+
+    // ===================================================
+
     public static void main(String[] args) {
         // String expr = "1+2*3+4*5";
         // int n = expr.length();
