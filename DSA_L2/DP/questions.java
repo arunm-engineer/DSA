@@ -99,7 +99,7 @@ public class questions {
         int n = slices.length;
         int numOfSlices = n/3; // Since I can pick at max only n/3 slices, rest slices picked by Alice & Bob
         
-        int[][] dp = new int[n][numOfSlices + 1];4y
+        int[][] dp = new int[n][numOfSlices + 1];
         
         for (int[] a : dp) Arrays.fill(a, -1);
         int ans1 = maxSizeSlices_mem(slices, 0, n-2, numOfSlices, dp);
