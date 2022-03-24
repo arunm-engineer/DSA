@@ -19,20 +19,20 @@ public class l002BST {
         return root == null ? -1 : Math.max(height(root.left), height(root.right)) + 1;
     }
 
-    public static TreeNode max(TreeNode root) {
+    public static int max(TreeNode root) {
         TreeNode curr = root;
         while(curr != null) // rightmost
             curr = curr.right;
 
-        return curr;
+        return curr.val;
     }
 
-    public static TreeNode min(TreeNode root) {
+    public static int min(TreeNode root) {
         TreeNode curr = root;
         while(curr != null) // rightmost
             curr = curr.left;
 
-        return curr;
+        return curr.val;
     }
 
     public static boolean find(TreeNode root, int data) {
@@ -50,20 +50,25 @@ public class l002BST {
     }
 
     public static ArrayList<TreeNode> nodeToRootPath(TreeNode root, int data) {
-        ArrayList<TreeNode> list = new ArrayList<>();
+        ArrayList<TreeNode> ans = new ArrayList<>();
         TreeNode curr = root;
+        boolean flag = false;
         while (curr != null) {
-            list.add(curr);
-            if (curr.val == data) 
-                return list;
+            ans.add(curr);
+            if (curr.val == data)  {
+                flag = true;
+                break;
+            }
             else if (curr.val < data) 
                 curr = curr.right;
             else 
                 curr = curr.left;
         }
 
-        list.clear();
-        return list;
+        if (flag == false) 
+            ans.clear();
+
+        return ans;
     }
 
     /****************************************************************************************************/
@@ -84,4 +89,36 @@ public class l002BST {
     }
 
     /****************************************************************************************************/
+
+    // LC 173 => TC O(1) constant time on an average, SC O(logn) stack holds at max height of the tree elements
+    class BSTIterator {
+        // Also can use LinkedList, ArrayDeque instead of Stack. Also ArrayDeque will be little faster than LinkedList.
+        Stack<TreeNode> stack; // With this at max we will only have height of the tree elements SC O(logn)
+
+        public BSTIterator(TreeNode root) {
+            stack = new Stack<TreeNode>();
+            addAllLeft(root); // Initially fill, with root and all left elements of the root
+        }
+        
+        public int next() {
+            TreeNode node = stack.pop();            
+            addAllLeft(node.right);
+
+            return node.val;
+        }
+        
+        public boolean hasNext() {
+            return stack.size() > 0;
+        }
+        
+        public void addAllLeft(TreeNode node) {
+            while (node != null) {
+                stack.push(node);
+                node = node.left;
+            }
+        }
+    }
+    
+    /****************************************************************************************************/
+    
 }
