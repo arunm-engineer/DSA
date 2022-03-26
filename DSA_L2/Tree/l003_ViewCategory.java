@@ -480,5 +480,5 @@ public class l003_ViewCategory {
      * => Diagonal View (Bottom Left)
      * => Diagonal View (Top Right)
      * 
-     * */ 
+     * */
 }
