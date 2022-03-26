@@ -8,6 +8,8 @@ public class l001 {
         TreeNode left = null;
         TreeNode right = null;
 
+        public TreeNode () {}
+
         public TreeNode(int val) {
             this.val = val;
         }
@@ -396,21 +398,76 @@ public class l001 {
     /****************************************************************************************************/
 
     // LC 236
-    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+    // Approach 1 (Okay Approach)
+    // This approach might not run if either of (p,q) nodes doesn't exist in Tree
+    public TreeNode lowestCommonAncestor_00(TreeNode root, TreeNode p, TreeNode q) {
         if (root == null)
             return null;
         
-        TreeNode left = lowestCommonAncestor(root.left, p, q);
-        TreeNode right = lowestCommonAncestor(root.right, p, q);
-        
-        if (p == root || q == root)
+        if (root == p || root == q) 
             return root;
-        else if (left != null && right != null)
+        
+        TreeNode left = lowestCommonAncestor_00(root.left, p, q);
+        TreeNode right = lowestCommonAncestor_00(root.right, p, q);
+        
+        if (left != null && right != null)
             return root;
         else if (left != null)
             return left;
-        else 
-        return right;
+        else if (right != null)
+            return right;
+        
+        return null;
+    }
+
+    // Approach 2 (Correct Approach for all cases)
+    // This approach works even if either of (p,q) node is not present in the Tree
+    public TreeNode lowestCommonAncestor_01(TreeNode root, TreeNode p, TreeNode q) {
+        lowestCommonAncestor_helper(root, p, q);
+        return LCA;
+    }
+    
+    TreeNode LCA = null; // GlobalVariable
+    public boolean lowestCommonAncestor_helper(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null) 
+            return false;
+        
+        boolean self = false;
+        if (root == p || root == q)
+            self = true;
+        
+        boolean left = lowestCommonAncestor_helper(root.left, p, q);
+        boolean right = lowestCommonAncestor_helper(root.right, p, q);
+        
+        if ((left && right) || (self && left) || (self && right))
+            LCA = root;
+        
+        return left || right || self;
+    }
+
+    // Approach 3 (Correct Approach for all cases)
+    // If don't want global variable use Dummy node or pair class. Below approach is Dummy node
+    public TreeNode lowestCommonAncestor_02(TreeNode root, TreeNode p, TreeNode q) {
+        TreeNode LCA = new TreeNode(); // Dummy node to escape LCA as  a global variable
+        lowestCommonAncestor_helper(root, p, q, LCA);
+        return LCA.left;
+    }
+    
+    public boolean lowestCommonAncestor_helper(TreeNode root, TreeNode p, TreeNode q, TreeNode LCA) {
+        if (root == null) 
+            return false;
+        
+        boolean self = false;
+        if (root == p || root == q)
+            self = true;
+        
+        boolean left = lowestCommonAncestor_helper(root.left, p, q, LCA);
+        boolean right = lowestCommonAncestor_helper(root.right, p, q, LCA);
+        
+        if ((left && right) || (self && left) || (self && right))
+            LCA.left = root;
+        
+        return left || right || self;
     }
 
     /****************************************************************************************************/
