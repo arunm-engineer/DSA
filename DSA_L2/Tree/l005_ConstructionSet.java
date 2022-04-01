@@ -1,3 +1,4 @@
+import java.util.LinkedList;
 
 public class l005_ConstructionSet {
 
@@ -6,10 +7,10 @@ public class l005_ConstructionSet {
         TreeNode left = null;
         TreeNode right = null;
 
-        public Treeroot() {
+        public TreeNode() {
         }
 
-        public Treeroot(int val) {
+        public TreeNode(int val) {
             this.val = val;
         }
     }
@@ -22,7 +23,7 @@ public class l005_ConstructionSet {
 
         int mid = (si + ei) / 2;
         int val = inorder[mid];
-        TreeNode root = new Treeroot(val);
+        TreeNode root = new TreeNode(val);
 
         root.left = constructFromInorder(inorder, si, mid-1);
         root.right = constructFromInorder(inorder, mid+1, ei);
@@ -32,8 +33,7 @@ public class l005_ConstructionSet {
 
     public static TreeNode bstFromInorder(int[] inorder) {
         int si = 0, ei = inorder.length-1;
-        return constructFromInOrder(inorder, si, ei);
-
+        return constructFromInorder(inorder, si, ei);
     }
 
     /****************************************************************************************************/
@@ -78,6 +78,49 @@ public class l005_ConstructionSet {
         postPointer = postorder.length-1;
         int leftRange = -(int) 1e9, rightRange = (int) 1e9;
         return constructBSTFromPostorder(postorder, leftRange, rightRange);
+    }
+
+    /****************************************************************************************************/
+
+    public static class BSTLvlPair {
+        int leftRange;
+        int rightRange;
+        TreeNode parent;
+
+        public BSTLvlPair(int leftRange, int rightRange, TreeNode parent) {
+            this.leftRange = leftRange;
+            this.rightRange = rightRange;
+            this.parent = parent;
+        }
+    }
+
+    public static TreeNode constructBSTFromLevelOrder(int[] levelorder) {
+        if (levelorder.length == 0)
+            return null;
+
+        LinkedList<BSTLvlPair> que = new LinkedList<>();
+        TreeNode root = new TreeNode(levelorder[0]);
+        que.add(new BSTLvlPair(-(int) 1e9, root.val, root));
+        que.add(new BSTLvlPair(root.val, (int) 1e9, root));
+        
+        int pointer = 1; // points to elems in levelorder elem
+        while (pointer < levelorder.length) {
+            BSTLvlPair rpair = que.removeFirst();
+            int leftRange = rpair.leftRange, rightRange = rpair.rightRange;
+            TreeNode parent = rpair.parent;
+
+            if (levelorder[pointer] < leftRange || levelorder[pointer] > rightRange)
+                continue;
+
+            TreeNode node = new TreeNode(levelorder[pointer++]);
+            if (node.val < parent.val) parent.left = node;
+            else parent.right = node;
+
+            que.addLast(new BSTLvlPair(leftRange, node.val, node));
+            que.addLast(new BSTLvlPair(node.val, rightRange, node));
+        }
+
+        return root;
     }
 
     /****************************************************************************************************/
