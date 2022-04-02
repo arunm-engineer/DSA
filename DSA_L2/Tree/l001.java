@@ -471,4 +471,54 @@ public class l001 {
     }
 
     /****************************************************************************************************/
+
+    public static class PredSuccPair {
+        TreeNode pred = null;
+        TreeNode succ = null;
+
+        TreeNode prev = null;
+    }
+
+    public static void predecessorSuccessorInBT(TreeNode root, int data, PredSuccPair pair) {
+        if (root == null)
+            return;
+
+        predecessorSuccessorInBT(root.left, data, pair);
+
+        TreeNode curr = root;
+        if (curr.val == data && pair.pred == null)
+            pair.pred = pair.prev;
+
+        if (pair.pred != null && pair.prev.val == data && pair.succ == null)
+            pair.succ = curr;
+
+        pair.prev = curr;
+
+        predecessorSuccessorInBT(root.right, data, pair);
+    }
+
+    /****************************************************************************************************/
+
+    public static class CeilFloorPair {
+        int ceil = (int) 1e9;
+        int floor = -(int) 1e9;
+    }
+
+    // ceil => min among all greater than's of data
+    // floor => max among all lesser than's of data
+    public static void ceilFloorInBT(TreeNode root, int data, CeilFloorPair pair) {
+        if (root == null)
+            return;
+
+        if (root.val < data) // floor
+            pair.floor = Math.max(root.val, pair.floor);
+        else if (root.val > data) // ceil
+            pair.ceil = Math.min(root.val, pair.ceil);
+
+        ceilFloorInBT(root.left, data, pair);
+        ceilFloorInBT(root.right, data, pair);
+    }
+
+    /****************************************************************************************************/
+
 }
