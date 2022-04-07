@@ -126,6 +126,7 @@ public class l005_ConstructionSet {
     /****************************************************************************************************/
     
     // All unique elems only in tree
+    // Refer notes for these formulas
     public static TreeNode constructBTFrom_Pre_In(int[] preorder, int[] inorder) {
         int n = inorder.length;
         int psi = 0, pei = n-1, isi = 0, iei = n-1;
@@ -138,7 +139,7 @@ public class l005_ConstructionSet {
 
         TreeNode root = new TreeNode(preorder[psi]);
         
-        int idx = findRoot_00(root, inorder, isi, iei);
+        int idx = findRoot_00(root.val, inorder, isi, iei);
         int t_elem = idx - isi; // Total elems in "left" substree from inorder
 
         root.left = constructBTFrom_Pre_In(preorder, inorder, isi, idx-1, psi+1, psi+t_elem); // Left call pre & in-ranges calc
@@ -147,10 +148,10 @@ public class l005_ConstructionSet {
         return root;
     }
 
-    public static int findRoot_00(TreeNode root, int[] inorder, int isi, int iei) {
+    public static int findRoot_00(int val, int[] inorder, int si, int ei) {
         int idx = -1;
-        for (int i = isi; i <= iei; i++) {
-            if (root.val == inorder[i]) {
+        for (int i = si; i <= ei; i++) {
+            if (val == inorder[i]) {
                 idx = i;
                 break;
             }
@@ -161,6 +162,8 @@ public class l005_ConstructionSet {
 
     /****************************************************************************************************/
 
+    // All unique elems only in tree
+    // Refer notes for these formulas
     public static TreeNode constructBTFrom_Post_In(int[] postorder, int[] inorder) {
         int n = inorder.length;
         int psi = 0, pei = n-1, isi = 0, iei = n-1;
@@ -173,7 +176,7 @@ public class l005_ConstructionSet {
 
         TreeNode root = new TreeNode(postorder[pei]);
         
-        int idx = findRoot_01(root, inorder, isi, iei);
+        int idx = findRoot_01(root.val, inorder, isi, iei);
         int t_elem = idx - isi; // Total elems in "right" substree from inorder
 
         root.left = constructBTFrom_Post_In(postorder, inorder, isi, idx-1, psi, psi+t_elem-1); // Left call pre & in-ranges calc
@@ -182,10 +185,10 @@ public class l005_ConstructionSet {
         return root;
     }
 
-    public static int findRoot_01(TreeNode root, int[] inorder, int isi, int iei) {
+    public static int findRoot_01(int val, int[] inorder, int si, int ei) {
         int idx = -1;
-        for (int i = isi; i <= iei; i++) {
-            if (root.val == inorder[i]) {
+        for (int i = si; i <= ei; i++) {
+            if (val == inorder[i]) {
                 idx = i;
                 break;
             }
@@ -195,4 +198,44 @@ public class l005_ConstructionSet {
     }
 
     /****************************************************************************************************/
+
+    // All unique elems only in tree
+    // Refer notes for these formulas
+    public static TreeNode constructBTFrom_Pre_Post(int[] preorder, int[] postorder) {
+        int n = preorder.length;
+        int prsi = 0, prei = n-1, posi = 0, poei = n-1;
+        return constructBTFrom_Pre_Post(preorder, postorder, prsi, prei, posi, poei);
+    }
+
+    public static TreeNode constructBTFrom_Pre_Post(int[] preorder, int[] postorder, int prsi, int prei, int posi, int poei) {
+        if (prsi > prei) // Out of Bounds
+            return null;
+
+        TreeNode root = new TreeNode(preorder[prsi]);
+        if (prsi == prei) // if both st & end are same points. Here next elem is out of range so return from here itself
+            return root;
+
+        int idx = findRoot_02(preorder[prsi+1], postorder, posi, poei);
+        int tel = idx - posi + 1; // Total elements in leftsubtree from postorder arr
+
+        root.left = constructBTFrom_Pre_Post(preorder, postorder, prsi+1, prsi+tel, posi, idx);
+        root.right = constructBTFrom_Pre_Post(preorder, postorder, prsi+tel+1, prei, idx+1, poei-1);
+
+        return root;
+    }
+
+    public static int findRoot_02(int val, int[] inorder, int si, int ei) {
+        int idx = -1;
+        for (int i = si; i <= ei; i++) {
+            if (val == inorder[i]) {
+                idx = i;
+                break;
+            }
+        }
+
+        return idx;
+    }
+
+    /****************************************************************************************************/
+
 }

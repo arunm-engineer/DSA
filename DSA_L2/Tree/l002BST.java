@@ -20,18 +20,18 @@ public class l002BST {
         return root == null ? -1 : Math.max(height(root.left), height(root.right)) + 1;
     }
 
-    public static int max(TreeNode root) {
+    public static int min(TreeNode root) {
         TreeNode curr = root;
-        while(curr != null) // rightmost
-            curr = curr.right;
+        while (curr.left != null) // leftmost
+            curr = curr.left;
 
         return curr.val;
     }
 
-    public static int min(TreeNode root) {
+    public static int max(TreeNode root) {
         TreeNode curr = root;
-        while(curr != null) // rightmost
-            curr = curr.left;
+        while (curr.right != null) // rightmost
+            curr = curr.right;
 
         return curr.val;
     }
@@ -43,7 +43,7 @@ public class l002BST {
                 return true;
             else if (curr.val < data)
                 curr = curr.right;
-            else 
+            else
                 curr = curr.left;
         }
 
@@ -56,17 +56,16 @@ public class l002BST {
         boolean flag = false;
         while (curr != null) {
             ans.add(curr);
-            if (curr.val == data)  {
+            if (curr.val == data) {
                 flag = true;
                 break;
-            }
-            else if (curr.val < data) 
+            } else if (curr.val < data)
                 curr = curr.right;
-            else 
+            else
                 curr = curr.left;
         }
 
-        if (flag == false) 
+        if (flag == false)
             ans.clear();
 
         return ans;
@@ -79,39 +78,41 @@ public class l002BST {
         TreeNode curr = root;
         while (curr != null) {
             if (p.val > curr.val && q.val > curr.val)
-            curr = curr.right;
+                curr = curr.right;
             else if (p.val < curr.val && q.val < curr.val)
-            curr = curr.left;
-            else 
-            return curr;
+                curr = curr.left;
+            else
+                return curr;
         }
-        
+
         return null;
     }
 
     /****************************************************************************************************/
 
-    // LC 173 => TC O(1) constant time on an average, SC O(logn) stack holds at max height of the tree elements
+    // LC 173 => TC O(1) constant time on an average, SC O(logn) stack holds at max
+    // height of the tree elements
     class BSTIterator {
-        // Also can use LinkedList, ArrayDeque instead of Stack. Also ArrayDeque will be little faster than LinkedList.
+        // Also can use LinkedList, ArrayDeque instead of Stack. Also ArrayDeque will be
+        // little faster than LinkedList.
         Stack<TreeNode> stack; // With this at max we will only have height of the tree elements SC O(logn)
 
         public BSTIterator(TreeNode root) {
             stack = new Stack<TreeNode>();
             addAllLeft(root); // Initially fill, with root and all left elements of the root
         }
-        
+
         public int next() {
-            TreeNode node = stack.pop();            
+            TreeNode node = stack.pop();
             addAllLeft(node.right);
 
             return node.val;
         }
-        
+
         public boolean hasNext() {
             return stack.size() > 0;
         }
-        
+
         public void addAllLeft(TreeNode node) {
             while (node != null) {
                 stack.push(node);
@@ -119,7 +120,43 @@ public class l002BST {
             }
         }
     }
-    
+
     /****************************************************************************************************/
-    
+
+    // BST find method traversal
+    // TC O(logn), SC O(1)
+    public static void predSuccInBST(TreeNode root, int data) {
+        TreeNode pred = null, succ = null, curr = root;
+
+        while (curr != null) {
+            if (curr.val == data) {
+                TreeNode leftMost = getLeftMost(root.right);
+                TreeNode rightMost = getRightMost(root.left);
+
+                succ = leftMost != null ? leftMost : succ;
+                pred = rightMost != null ? rightMost : pred;
+            } else if (curr.val < data) { // Moving left => set potential succ
+                succ = curr;
+                curr = curr.left;
+            } else { // Moving right => set potential pred
+                pred = curr;
+                curr = curr.right;
+            }
+        }
+    }
+
+    public static TreeNode getLeftMost(TreeNode root) {
+        while (root.left != null)
+            root = root.left;
+        return root;
+    }
+
+    public static TreeNode getRightMost(TreeNode root) {
+        while (root.right != null)
+            root = root.right;
+        return root;
+    }
+
+    /****************************************************************************************************/
+
 }
