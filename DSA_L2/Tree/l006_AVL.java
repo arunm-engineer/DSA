@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class l006_AVL {
 
     public static class TreeNode {
@@ -71,7 +73,7 @@ public class l006_AVL {
         return B;
     }
     
-    // TC O(1)
+    // TC O(1) => Why O(1) achieved, since we're storing ht within node itself, else we would have to calc ht. always costing O(logn) time
     public static void updateHeightBalance(TreeNode node) {
         int lh = node.left != null ? node.left.height : -1;
         int rh = node.right != null ? node.right.height : -1;
@@ -145,11 +147,50 @@ public class l006_AVL {
         display(root.right);
     }
 
-    public static void main(String[] args) {
+    public static void constructAVL() {
         TreeNode root = null;
         for (int val = 1; val <= 10; val++) {
             root = insertIntoBST(root, val*10);
         }
         display(root);
+    }
+
+    /****************************************************************************************************/
+
+    // LC 1382
+    public TreeNode balanceBST(TreeNode root) {
+        // Why inorder? Since inorder is sorted in BST we can then use Binary Search mid logic and convert a balanced BST
+        ArrayList<TreeNode> inorder_list = new ArrayList<>();
+        inorder(root, inorder_list); 
+
+        int l = 0, r = inorder_list.size()-1;
+        return convertBalancedBST(inorder_list, l, r);
+    }
+    
+    public static TreeNode convertBalancedBST(ArrayList<TreeNode> inorder_list, int l, int r) {
+        if (l > r)
+            return null;
+        
+        int mid = (l+r)/2;
+        TreeNode node = inorder_list.get(mid);
+        node.left = convertBalancedBST(inorder_list, l, mid-1);
+        node.right = convertBalancedBST(inorder_list, mid+1, r);
+        
+        return node;
+    }
+    
+    public static void inorder(TreeNode root, ArrayList<TreeNode> inorder_list) {
+        if (root == null)
+            return;
+        
+        inorder(root.left, inorder_list);
+        inorder_list.add(root);
+        inorder(root.right, inorder_list);
+    }
+
+    /****************************************************************************************************/
+
+    public static void main(String[] args) {
+        constructAVL();
     }
 }

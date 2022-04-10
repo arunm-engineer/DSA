@@ -7,8 +7,7 @@ public class l004_TreeConversionSet {
         TreeNode left = null;
         TreeNode right = null;
 
-        public TreeNode() {
-        }
+        public TreeNode() {}
 
         public TreeNode(int val) {
             this.val = val;
@@ -279,5 +278,4 @@ public class l004_TreeConversionSet {
     }
 
     /****************************************************************************************************/
-
 }
