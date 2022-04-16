@@ -57,6 +57,13 @@ public class l006_AVL {
         updateHeightBalance(B);
 
         return B;
+
+        // Above we didn't need to rotate again since we were maintaining balance factor along with construction
+        // Edge case => More rotation possible in ST since levels of node are shifted
+        // Perform rotation again to balance on level shifting nodes
+
+        // B.left = getRotation(A);
+        // return getRotation(B);
     }
 
     // TC O(1)
@@ -71,6 +78,13 @@ public class l006_AVL {
         updateHeightBalance(B);
 
         return B;
+        
+        // Above we didn't need to rotate again since we were maintaining balance factor along with construction
+        // Edge case => More rotation possible in ST since levels of node are shifted
+        // Perform rotation again to balance on level shifting nodes
+
+        // B.right = getRotation(A);
+        // return getRotation(B);
     }
     
     // TC O(1) => Why O(1) achieved, since we're storing ht within node itself, else we would have to calc ht. always costing O(logn) time
@@ -158,6 +172,7 @@ public class l006_AVL {
     /****************************************************************************************************/
 
     // LC 1382
+    // Approach 1 => Immediate striking & easy solution
     public TreeNode balanceBST(TreeNode root) {
         // Why inorder? Since inorder is sorted in BST we can then use Binary Search mid logic and convert a balanced BST
         ArrayList<TreeNode> inorder_list = new ArrayList<>();
@@ -187,6 +202,9 @@ public class l006_AVL {
         inorder_list.add(root);
         inorder(root.right, inorder_list);
     }
+
+    // Approach 2 => Using AVL
+    // Refer l009.java for this solution LC 1382 with AVL
 
     /****************************************************************************************************/
 
