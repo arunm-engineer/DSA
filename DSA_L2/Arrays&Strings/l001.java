@@ -94,7 +94,7 @@ public class l001 {
             if (nums[i] == val) {
                 count++;
             }
-            else {
+            else { // Distinct elem got
                 if (count > 0) {
                     count--; // Pair distinct elems
                 }
@@ -121,6 +121,57 @@ public class l001 {
 //             return true; // Majority elem exist
 //         else 
 //             return false; // Majority elem doesn't exist
+    }
+
+    /****************************************************************************************************/
+
+    // LC 229
+    public List<Integer> majorityElement(int[] nums) {
+        int n = nums.length;
+        
+        int val1 = nums[0];
+        int count1 = 1;
+        
+        int val2 = -(int) 1e9; // assume -(int) 1e9 just for temp purpose, since count2 will handle initialization
+        int count2 = 0; // we need to yet initialize, so 0
+        
+        for (int i = 1; i < n; i++) {
+            if (nums[i] == val1)
+                count1++;
+            else if (nums[i] == val2)
+                count2++;
+            else { // distinct elem
+                if (count1 == 0) { // val1 initialization
+                    val1 = nums[i];
+                    count1 = 1;
+                }
+                else if (count2 == 0) { // val2 initialization
+                    val2 = nums[i];
+                    count2 = 1;
+                }
+                else { // pair up distinct elems
+                    count1--;
+                    count2--;
+                }
+            }
+        }
+        
+        // check for val1 & val2, freq > n/3
+        int freq1 = 0, freq2 = 0;
+        for (int i = 0; i < n; i++) {
+            if (nums[i] == val1)
+                freq1++;
+            else if (nums[i] == val2)
+                freq2++;
+        }
+
+        List<Integer> ans = new ArrayList<>();
+        if (freq1 > n/3)
+            ans.add(val1);
+        if (freq2 > n/3)
+            ans.add(val2);
+        
+        return ans;
     }
 
     /****************************************************************************************************/
