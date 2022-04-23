@@ -84,7 +84,7 @@ public class l001 {
 
     // LC 169
     // Moore's Voting Algorithm => TC O(n) SC O(1)
-    public int majorityElement(int[] nums) {
+    public int majorityElement_01(int[] nums) {
         int i = 1, n = nums.length;
         
         int val = nums[0];
@@ -126,7 +126,7 @@ public class l001 {
     /****************************************************************************************************/
 
     // LC 229
-    public List<Integer> majorityElement(int[] nums) {
+    public List<Integer> majorityElement_02(int[] nums) {
         int n = nums.length;
         
         int val1 = nums[0];
@@ -172,6 +172,265 @@ public class l001 {
             ans.add(val2);
         
         return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // Majority Element General [Pepcoding Portal]
+    public static ArrayList<Integer> majorityElement_03(int[] arr, int k) {
+        int n = arr.length;
+        HashMap<Integer, Integer> map = new HashMap<>();
+        
+        // freq map for elems
+        for (int i = 0; i < n; i++) {
+            if (map.containsKey(arr[i])) {
+                map.put(arr[i], map.get(arr[i]) + 1);
+            }
+            else {
+                map.put(arr[i], 1);
+            }
+        }
+        
+        ArrayList<Integer> ans = new ArrayList<>();
+        for (int val : map.keySet()) {
+            int freq = map.get(val);
+            if (freq > n/k)
+                ans.add(val);
+        }
+        
+        Collections.sort(ans); // This is just for output matching
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 556
+    public int nextGreaterElement(int n) {
+        if (n < 10) // Bcoz already in max possibility form
+            return -1;
+
+        String str = nextGreaterElement_("" + n);
+        
+        long ans = Long.parseLong(str);
+        if (ans <= Integer.MAX_VALUE) // With in integer range, Leetcode check
+            return (int) ans;
+        else 
+            return -1;
+    }
+
+    public static String nextGreaterElement_(String n) {
+        char[] num = n.toCharArray();
+        int dipIndex = findDipIndex(num);
+        if (dipIndex == -1)
+            return "" + -1; // Cannot form next greater, since already in maxPossibility
+        
+        int ceilIndex = findCeilIndex(num, num[dipIndex], dipIndex+1, num.length-1);
+        
+        swap(num, dipIndex, ceilIndex);
+        reverse(num, dipIndex+1, num.length-1);
+
+        return String.valueOf(num);
+    }
+
+    public static int findDipIndex(char[] num) {
+        int index = -1;
+
+        int n = num.length;
+        for (int i = n-1; i > 0; i--) {
+            if (num[i-1] < num[i]) {
+                index = i-1;
+                break;
+            }
+        }
+
+        return index;
+    }
+
+    public static int findCeilIndex(char[] num, int dipVal, int left, int right) {
+        int ceilIndex = -1; // ceil => Just greater than dipVal, also ceil index will exist for sure
+        // LSD to MSD first ceil
+        for (int i = left; i <= right; i++) {
+            if (num[i] > dipVal) 
+                ceilIndex = i;
+        }
+
+        return ceilIndex;
+    }
+
+    public static void swap(char[] num, int i, int j) {
+        char temp = num[i];
+        num[i] = num[j];
+        num[j] = temp;
+    }
+
+    public static void reverse(char[] num, int left, int right) {
+        while (left < right) {
+            swap(num, left, right);
+            left++;
+            right--;
+        }
+    }
+
+    /****************************************************************************************************/
+
+    // LC 905
+    public int[] sortArrayByParity(int[] nums) {
+        int i = 0, j = 0;
+        while (j < nums.length) {
+            if (nums[j]%2 == 1) { // odd
+                j++; // increase odd segment
+            }
+            else { // even
+                swap_00(nums, i, j);
+                i++;
+                j++;
+            }
+        }
+        
+        return nums;
+    }
+    
+    public static void swap_00(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 628
+    public int maximumProduct(int[] nums) {
+        int max1 = -(int) 1e9, max2 = -(int) 1e9, max3 = -(int) 1e9;
+        int min1 = (int) 1e9, min2 = (int) 1e9; // why only 2 min, bcoz mins will make again -ve on xply
+        
+        for (int val : nums) {
+            // For max
+            if (val > max1) {
+                max3 = max2;
+                max2 = max1;
+                max1 = val;
+            }
+            else if (val > max2) {
+                max3 = max2;
+                max2 = val;
+            }
+            else if (val > max3) {
+                max3 = val;
+            }
+            
+            // For min
+            if (val < min1) {
+                min2 = min1;
+                min1 = val;
+            }
+            else if (val < min2) {
+                min2 = val;
+            }
+        }
+        
+        int maxProduct = Math.max((max1 * max2 * max3), (min1 * min2 * max1));
+        return maxProduct;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 769
+    public int maxChunksToSorted(int[] arr) {
+        int n = arr.length;
+        
+        int chunks = 0;
+        int maxVal = -(int) 1e9;
+        for (int idx = 0; idx < n; idx++) {
+            maxVal = Math.max(maxVal, arr[idx]);
+            
+            if (idx == maxVal) // max impact range the maxVal can have is upto the idx, (0 <= val <= n-1)
+                chunks++;
+        }
+        
+        return chunks;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 768
+    public int maxChunksToSorted(int[] arr) {
+        int n = arr.length;
+        
+        // No need for seperate leftMax, since we can make & manage leftMax along traversal itself
+        int[] rightMin = new int[n+1]; // why n+1, just to handle 
+        rightMin[n] = (int) 1e9; // for last edge case to incr final chunk
+        
+        // Prepare rightMin
+        for (int i = n-1; i >= 0; i--) {
+            rightMin[i] = Math.min(rightMin[i+1], arr[i]);
+        }
+        
+        int chunks = 0;
+        int leftMax = -(int) 1e9;
+        for (int idx = 0; idx < n; idx++) {
+            leftMax = Math.max(leftMax, arr[idx]);
+            
+            if (leftMax <= rightMin[idx+1])
+                chunks++;
+        }
+        
+        return chunks;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 747
+    public int dominantIndex(int[] nums) {
+        if (nums.length == 1) // Edge case; one elem is obviously atleast twice than every other elem
+            return 0;
+        
+        int largestIdx = -1;
+        int max1 = -(int) 1e9, max2 = -(int) 1e9;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] > max1) {
+                max2 = max1;
+                max1 = nums[i];
+                largestIdx = i;
+            }
+            else if (nums[i] > max2) {
+                max2 = nums[i];
+            }
+        }
+        
+        return (max1 >= 2*max2) ? largestIdx : -1;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 345
+    public String reverseVowels(String s) {
+        char[] arr = s.toCharArray();
+        
+        int n = s.length();
+        int i = 0, j = n-1;
+        while (i < j) {
+            while (i < j && !isVowel(arr[i]))
+                i++;
+            while (i < j && !isVowel(arr[j]))
+                j--;
+            
+            swap(arr, i, j);
+            i++;
+            j--;
+        }
+        
+        return String.valueOf(arr);
+    }
+    
+    public static boolean isVowel(char ch) {
+        String vowels = "AEIOUaeiou";
+        return vowels.contains(ch + "");
+    }
+    
+    public static void swap(char[] arr, int i, int j) {
+        char temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 
     /****************************************************************************************************/
