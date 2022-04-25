@@ -435,4 +435,31 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // LC 795
+    public int numSubarrayBoundedMax(int[] nums, int left, int right) {
+        int n = nums.length;
+
+        int i = 0, j = 0;
+        int prevCount = 0; // indicates last subarrs count having max in-range
+        int count = 0; // indicates total no. of subarrs having max in-range
+        while (i < n) {
+            if (nums[i] >= left && nums[i] <= right) { // max in-range
+                prevCount = i-j+1;
+                count += i-j+1;
+            }
+            else if (nums[i] < left) { // less than range,but has no impact on max of subarr, so consider
+                count += prevCount; //combine nums[i] in prev subarrs in-range forming new unique subarrs
+            }
+            else { // greater than range, impacts max of any subarr formed which will include nums[i]
+                prevCount = 0; // Break point, so reset
+                j = i+1; // move j, since can't subarr from j, since max has been impacted
+            }
+            i++;
+        }
+        
+        return count;
+    }
+
+    /****************************************************************************************************/
+
 }

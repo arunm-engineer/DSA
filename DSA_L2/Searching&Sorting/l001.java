@@ -161,6 +161,7 @@ public class l001 {
     /****************************************************************************************************/
 
     // LC 658
+    // Approach 1 TC O(nlogk + klogk) SC O(k)
     public List<Integer> findClosestElements(int[] arr, int k, int x) {
         PriorityQueue<GapPair> pq = new PriorityQueue<>(Collections.reverseOrder()); // Max Heap
         
@@ -173,7 +174,7 @@ public class l001 {
             else if (pq.size() == k) {
                 GapPair peekPair = pq.peek();
                 if (curPair.gap < peekPair.gap) {
-                    pq.remove();
+                    pq.remove(); // remove worst candidate to put new best candidate
                     pq.add(curPair);                    
                 }
             }
@@ -206,6 +207,58 @@ public class l001 {
             else // equal gap
                 return this.elem - other.elem;
         }
+    }
+
+    // Approach 2 Optimised TC O(logn + k + klogk), SC O(1)
+    public List<Integer> findClosestElements(int[] arr, int k, int x) {
+        int n = arr.length;
+        List<Integer> list = new ArrayList<>();
+        
+        // 1. Binary search to reach best closest position to x
+        int low = 0, high = n-1, index = 0; // index will take to best possible gap closest to x
+        while (low <= high) {
+            int mid = (low+high)/2;
+            index = Math.abs(arr[index]-x) > Math.abs(arr[mid]-x) ? mid : index; // Get closest gap idx to x
+            
+            if (arr[mid] == x) 
+                break;
+            else if (arr[mid] < x)
+                low = mid + 1;
+            else 
+                high = mid - 1;
+        }
+        
+        // 2. Two pointers to find the best k-1 closest elems to x, since one elem is found arr[mid]
+        // k-1 closest elems would be found either in left or right region from best pt. we found above
+        int left = index-1, right = index;
+        while (left >= 0 && right < n && list.size() < k) {
+            int leftElem = arr[left], rightElem = arr[right];
+            int leftElemGap = Math.abs(leftElem - x), rightElemGap = Math.abs(rightElem - x);
+            
+            if (leftElemGap <= rightElemGap) {
+                list.add(leftElem);
+                left--;
+            }
+            else {
+                list.add(rightElem);
+                right++;
+            }
+        }
+        
+        // Edge case: Might be the size of arr is exhausted, but there are still few k-y elems remaining
+        while (list.size() < k && left >= 0) {
+            int leftElem = arr[left];
+            list.add(leftElem);
+            left--;
+        }
+        while (list.size() < k && right < n) {
+            int rightElem = arr[right];
+            list.add(rightElem);
+            right++;
+        }
+        
+        Collections.sort(list); // Asked in question to sort o/p
+        return list;
     }
 
     /****************************************************************************************************/
