@@ -261,5 +261,66 @@ public class l001 {
         return list;
     }
 
+    // Approach 3 => Avoided the sorting complexity at last
+    // TC O(logn + k)
+    public List<Integer> findClosestElements(int[] arr, int k, int x) {
+        int n = arr.length;
+        List<Integer> list = new ArrayList<>();
+        
+        // 1. Binary search to reach best closest position to x
+        int low = 0, high = n-1;
+        int minGapVal = (int) 1e9;
+        int minGapIndex = -1; // to find closest index to x
+        
+        while (low <= high) {
+            int mid = low + (high-low)/2;
+            
+            int currGapVal = Math.abs(arr[mid] - x);
+            if (currGapVal < minGapVal) {
+                minGapVal = currGapVal;
+                minGapIndex = mid;
+            }
+            
+            if (arr[mid] == x) 
+                break;
+            else if (arr[mid] < x)
+                low = mid + 1;
+            else 
+                high = mid - 1;
+        }
+        
+        // 2. Two pointers to find the best k-1 window of closest elems to x
+        int left = minGapIndex-1, right = minGapIndex+1;
+        int count = 1; // tracks k size, one elem incl so 1 size default
+        while (left >= 0 && right < n && count < k) {
+            int leftElem = arr[left], rightElem = arr[right];
+            int leftElemGap = Math.abs(leftElem - x), rightElemGap = Math.abs(rightElem - x);
+            
+            if (leftElemGap <= rightElemGap) 
+                left--;
+            else 
+                right++;
+            
+            count++;
+        }
+        
+        // Edge case: Might be the size of arr is exhausted, but there are still few k-y elems remaining
+        while (count < k && left >= 0) {
+            int leftElem = arr[left];
+            left--;
+            count++;
+        }
+        while (count < k && right < n) {
+            int rightElem = arr[right];
+            right++;
+            count++;
+        }
+        
+        for (int i = left+1; i <= right-1; i++) // dump k closest elems (already in sorted form)
+            list.add(arr[i]);
+        
+        return list;
+    }
+
     /****************************************************************************************************/
 }

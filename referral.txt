@@ -1,0 +1,25 @@
+<company-name> Referral, Job ID <ID>, <position-name>
+
+Greetings <referrer-name>, this Arun M, currently working as Member Technical Staff at Zoho Corporation.
+
+What am I here for?
+There is an opening for the position of <Position-name> at <company-name>. I would like to join this position and would like you to refer me for the respective position.
+
+Why I would be a perfect fit for this position?
+Possess industry level knowledge of working with Frontend systems of product and also the skill-sets demanding for the position aligns very well with my skill-sets.
+• Solved 270+ problems efficiently using Data Structures and Algorithms with clean code implementation and holds good grasp over concepts.
+• Worked on technologies like React.js, Redux, HTML, CSS on production level.
+• Familiar with modern-day tools like Node.js, Express.js, Docker, GitHub Actions.
+• Possess in-depth knowledge of the languages like JavaScript, TypeScript, Java. 
+
+Resume Link
+https://drive.google.com/file/d/1IV2mUak2Vk4TEkO-9E4-2ibwREZk8nBU/view?usp=sharing
+
+Job ID <ID>
+Job Link
+<Link>
+
+Hope to hear some positive response from you. 
+Thank you.
+
+// ===========================================================================================================================
