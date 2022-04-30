@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class l001 {
     
     // LC 925
@@ -226,7 +228,7 @@ public class l001 {
         
         int ceilIndex = findCeilIndex(num, num[dipIndex], dipIndex+1, num.length-1);
         
-        swap(num, dipIndex, ceilIndex);
+        swap_00(num, dipIndex, ceilIndex);
         reverse(num, dipIndex+1, num.length-1);
 
         return String.valueOf(num);
@@ -257,7 +259,7 @@ public class l001 {
         return ceilIndex;
     }
 
-    public static void swap(char[] num, int i, int j) {
+    public static void swap_00(char[] num, int i, int j) {
         char temp = num[i];
         num[i] = num[j];
         num[j] = temp;
@@ -335,7 +337,7 @@ public class l001 {
     /****************************************************************************************************/
 
     // LC 769
-    public int maxChunksToSorted(int[] arr) {
+    public int maxChunksToSorted_(int[] arr) {
         int n = arr.length;
         
         int chunks = 0;
