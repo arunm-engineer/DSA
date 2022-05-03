@@ -4,17 +4,32 @@ import java.util.ArrayList;
 
 public class Heap {
     private ArrayList<Integer> arr;
+    private boolean isMinFlag; // flag indicates minHeap or maxHeap; false -> maxHeap, true -> minHeap
 
     public Heap() {
         this.arr = new ArrayList<>();
     }
 
+    public Heap(boolean flag) {
+        this();
+        this.isMinFlag = flag;
+    }
+
     // TC O(n + nlogn) => By looking below steps
     // TC O(n) => actually proved mathematically
     public Heap(int[] arr) {
-        this(); // calling default constructor for initialization
+        this(false); // calling default constructor for initialization
         for (int elem : arr)
-            this.arr.add(elem);
+            this.add(elem);
+
+        for (int i = this.arr.size()-1; i >= 0; i--)  // check heap property and fix at each subtree node
+            downHeapify(i);
+    }
+
+    public Heap(int[] arr, boolean flag) {
+        this(flag); // calling default constructor for initialization
+        for (int elem : arr)
+            this.add(elem);
 
         for (int i = this.arr.size()-1; i >= 0; i--)  // check heap property and fix at each subtree node
             downHeapify(i);
@@ -24,7 +39,10 @@ public class Heap {
     // custom compareTo
     // From compareTo result, always take action on the basis of "this's" value
     private boolean compareTo(int i, int j) {
-        return this.arr.get(i) > this.arr.get(j); // this is for max-heap
+        if (this.isMinFlag == false) // maxHeap
+            return this.arr.get(i) > this.arr.get(j);
+        else // minHeap
+            return this.arr.get(j) > this.arr.get(i);
     }
 
     // TC O(1)
