@@ -19,7 +19,9 @@ public class l001 {
         graph[v].add(new Edge(u, w));
     }
 
+    // TC O(2E) -> O(E) // why 2E, bcoz bi-directional graph. Total no. of edges will be 2E. Why complexity not O(V.E)? Not all vertices have E num of edges -> Refer notes
     public static void display(ArrayList<Edge>[] graph) {
+
         for (int u = 0; u < graph.length; u++) {
             System.out.print(u + " -> ");
             for (Edge e : graph[u]) 
@@ -28,9 +30,111 @@ public class l001 {
         }
     }
 
+    // ---------------------------------------------------------------------------------------------------------
+
+    // TC O(E) Worst case if all edges connected in the same single vertice
+    // returns the idx of edge u->v from the list at uth vertice
+    public static int findEdge(ArrayList<Edge>[] graph, int u, int v) {
+        int idx = -1;
+        for (int i = 0; i < graph[u].size(); i++) {
+            Edge e = graph[u].get(i);
+            if (e.v == v) {
+                idx = i;
+                break;
+            }
+        }
+
+        return idx;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // TC O(E)
+    // Worst case -> all edges are connected in the same singe vertice
+    public static void removeEdge(ArrayList<Edge>[] graph, int u, int v) {
+        int idx = findEdge(graph, u, v); // for worst case O(E)
+        if (idx != -1) graph[u].remove(idx); // shifting after removal O(E)
+
+        idx = findEdge(graph, v, u); // for worst case O(1)
+        if (idx != -1) graph[v].remove(idx); // O(1)
+        // Why O(1) -> uth vertice will contain all edges connected to v
+        // for vth there will exist only one edge v->u in the vth vertice list => so findEdge and removal for v->u edge will be O(1) operation
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // hasPath
+    // TC O(E) -> where E is the total no of edges in that particular component (we don't travel other components or vertices)
+    // why not unmarking -> we don't need to travel all paths, if src to dest doesn't exist from one path in a connected graph then it will not exist in other path as well
+    public static boolean dfs_findPath(ArrayList<Edge>[] graph, int src, int dest, boolean[] visited) {
+        if (src == dest)
+            return true;
+
+        visited[src] = true;
+
+        boolean res = false;
+        for (Edge e : graph[src]) {
+            if (!visited[e.v])
+                res = res || dfs_findPath(graph, e.v, dest, visited);
+        }
+
+        return res;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // TC O(V!) -> why will know later
+    public static int printAllPath(ArrayList<Edge>[] graph, int src, int dest, boolean[] visited, String psf, int wsf) {
+        if (src == dest)  {
+            System.out.println(psf + dest + " @ " + wsf);
+            return 1;
+        }
+
+        visited[src] = true;
+
+        int count = 0;
+        for (Edge e : graph[src]) {
+            if (!visited[e.v]) 
+                count += printAllPath(graph, e.v, dest, visited, psf + src, wsf + e.w);
+        }
+
+        visited[src] = false;
+
+        return count;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    public static void dfs_GCC(ArrayList<Edge>[] graph, int src, boolean[] visited) {
+        visited[src] = true;
+        for (Edge e : graph[src]) {
+            if (!visited[e.v])
+                dfs_GCC(graph, e.v, visited);
+        }
+    }
+
+    // Generally, TC O(E+V) -> E is total no of edges in all components of graph; V is the total no of loose vertices
+    // TC O(E) if no loose vertices
+    // TC O(V) if only loose vertices; We just substitute 0 accordingly seeing which exists in the O(E+V) commplexity
+    public static void getConnectedComponents(ArrayList<Edge>[] graph, int N) {
+        boolean[] visited = new boolean[N];
+
+        int components = 0;
+        for (int i = 0; i < N; i++) {
+            if (!visited[i]) {
+                components++;
+                dfs_GCC(graph, i, visited);;
+            }
+        }
+
+        System.out.println(components);
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
     public static void constructGraph() {
         int N = 7;
-        ArrayList<Edge>[] graph = new ArrayList[7];
+        ArrayList<Edge>[] graph = new ArrayList[N];
         for (int i = 0; i < N; i++)
             graph[i] = new ArrayList<Edge>();
 
@@ -43,7 +147,18 @@ public class l001 {
         addEdge(graph, 4, 6, 8);
         addEdge(graph, 5, 6, 3);
 
-        display(graph);
+        // display(graph);
+
+        // removeEdge(graph, 3, 4);
+
+        boolean[] visited = new boolean[N];
+        // boolean res = dfs_findPath(graph, 0, 6, visited);
+        // System.out.println(res);
+
+        // int count = printAllPath(graph, 0, 6, visited, "", 0);
+        // System.out.println(count);
+
+        getConnectedComponents(graph, N);
     }
 
     public static void main(String[] args) {
