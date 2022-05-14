@@ -158,7 +158,7 @@ public class l001 {
         // int count = printAllPath(graph, 0, 6, visited, "", 0);
         // System.out.println(count);
 
-        getConnectedComponents(graph, N);
+        // getConnectedComponents(graph, N);
     }
 
     public static void main(String[] args) {
