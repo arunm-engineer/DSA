@@ -69,7 +69,7 @@ public class dfs_Questions {
 
     // ---------------------------------------------------------------------------------------------------------
 
-    // LC 463 // TC O(E+V)
+    // LC 463 TC O(E+V)
     public int islandPerimeter_00(int[][] grid) {
         int[][] dir = {{-1, 0}, {0,1}, {1, 0}, {0, -1}};
         
@@ -134,6 +134,88 @@ public class dfs_Questions {
         // formula -> 4 sides, 2 boxes shares a edge
         int perimeter = (validCellsCount * 4) - (neighbourCellsCount * 2); 
         return perimeter;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // LC 130 TC O(E+V)
+    public void solve(char[][] board) {
+        int[][] dir = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        int n = board.length, m = board[0].length;
+        
+        for (int sr = 0; sr < n; sr++) {
+            for (int sc = 0; sc < m; sc++) {
+                // call only from boundary pts, this boundary pt. is pt. from where water will flow out
+                // since that as starting pt. we can mark the entire place where water would flow out
+                if((sr == 0 || sr == n-1 || sc == 0 || sc == m-1) && board[sr][sc] == 'O')
+                    dfs_surroundedRegions(board, sr, sc, dir);
+            }
+        }
+        
+        for (int i = 0; i < n; i++)  {
+            for (int j = 0; j < m; j++) {
+                if (board[i][j] == '#') // ehy unmark, since water flowing area to be remained as it is
+                    board[i][j] = 'O';
+                else // water non-flowing areas to be, marked as buildings
+                    board[i][j] = 'X';
+            }
+        }
+    }
+    
+    private void dfs_surroundedRegions(char[][] grid, int sr, int sc, int[][] dir) {
+        grid[sr][sc] = '#'; // marking all places where water would not last (water would flow out)
+        
+        for (int d = 0; d < dir.length; d++) {
+            int r = sr + dir[d][0];
+            int c = sc + dir[d][1];
+            
+            if (r >= 0 && r < grid.length && c >= 0 && c < grid[0].length && grid[r][c] == 'O')
+                dfs_surroundedRegions(grid, r, c, dir);
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // https://www.hackerrank.com/challenges/journey-to-the-moon/problem
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // LC 1905
+    public int countSubIslands(int[][] grid1, int[][] grid2) {
+        int[][] dir = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        
+        int n = grid2.length, m = grid2[0].length;
+        int countOfSubIslands = 0;
+        for (int sr = 0; sr < n; sr++) {
+            for (int sc = 0; sc < m; sc++) {
+                if (grid2[sr][sc] == 1) {
+                    boolean res = dfs_countSubIslands(grid1, grid2, sr, sc, dir);
+                    if (res)
+                        countOfSubIslands++;
+                }
+            }
+        }
+        
+        return countOfSubIslands;
+    }
+    
+    private boolean dfs_countSubIslands(int[][] grid1, int[][] grid2, int sr, int sc, int[][] dir) {
+        int n = grid2.length, m = grid2[0].length;
+        grid2[sr][sc] = 0; // mark
+        
+        boolean res = true;
+        for (int d = 0; d < dir.length; d++) {
+            int r = sr + dir[d][0];
+            int c = sc + dir[d][1];
+            
+            if (r >= 0 && r < n && c >= 0 && c < m && grid2[r][c] == 1) 
+                res = dfs_countSubIslands(grid1, grid2, r, c, dir) && res; 
+                
+            // why res afterwards rec call, bcoz if "false", we still want to mark that entire land as useless by "making rec calls",
+            // so that the other parts of island on later point don't claim as subIsland, since it is not valid
+        }
+        
+        return res && grid1[sr][sc] == 1; // checking myself also (for valid part of island)
     }
 
     // ---------------------------------------------------------------------------------------------------------
