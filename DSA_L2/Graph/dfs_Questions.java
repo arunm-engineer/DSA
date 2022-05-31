@@ -1,3 +1,5 @@
+import java.util.HashSet;
+
 public class dfs_Questions {
 
     // LC 200
@@ -177,6 +179,48 @@ public class dfs_Questions {
     // ---------------------------------------------------------------------------------------------------------
 
     // https://www.hackerrank.com/challenges/journey-to-the-moon/problem
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // LC 694 (Premium)
+    // LintCode 860
+    public int numberofDistinctIslands(int[][] grid) {
+        int n = grid.length, m = grid[0].length;
+        int[][] dir = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        String[] dirS = {"T", "R", "D", "L"};
+        HashSet<String> set = new HashSet<>();
+        StringBuilder isLandPattern;
+
+        for (int sr = 0; sr < n; sr++) {
+            for (int sc = 0; sc < m; sc++) {
+                if (grid[sr][sc] == 1) {
+                    isLandPattern = new StringBuilder();
+                    dfs_numOfDistinctIslands(grid, sr, sc, dir, dirS, isLandPattern);
+                    set.add(isLandPattern.toString());
+                }
+                
+            }
+        }
+
+        return set.size();
+    }
+
+    private void dfs_numOfDistinctIslands(int[][] grid, int sr, int sc, int[][] dir, String[] dirS, StringBuilder isLandPattern) {
+        int n = grid.length, m = grid[0].length;
+
+        grid[sr][sc] = 0;
+
+        for (int d = 0; d < dir.length; d++) {
+            int r = sr + dir[d][0];
+            int c = sc + dir[d][1];
+
+            if (r >= 0 && r < n && c >= 0 && c < m && grid[r][c] == 1) {
+                isLandPattern.append(dirS[d]);
+                dfs_numOfDistinctIslands(grid, r, c, dir, dirS, isLandPattern);
+                isLandPattern.append("B"); // backtracking
+            }
+        }
+    }
 
     // ---------------------------------------------------------------------------------------------------------
 
