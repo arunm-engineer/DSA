@@ -198,7 +198,6 @@ public class dfs_Questions {
                     dfs_numOfDistinctIslands(grid, sr, sc, dir, dirS, isLandPattern);
                     set.add(isLandPattern.toString());
                 }
-                
             }
         }
 
