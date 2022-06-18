@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 public class bfs_Questions {
@@ -187,6 +189,88 @@ public class bfs_Questions {
         }
         
         return grid;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // LC 886
+    public boolean possibleBipartition(int n, int[][] dislikes) {
+        ArrayList<Integer>[] graph = constructGraph(dislikes, n);
+        
+        int[] visited = new int[graph.length];
+        Arrays.fill(visited, -1);
+        
+        // Why using BiPartite logic, since bipartite checks for independent sets of separation of nodes
+        boolean res = true;
+        for (int i = 1; i < visited.length; i++) {
+            if (visited[i] == -1) {
+                res = res && bfs_isBiPartite(graph, i, visited);
+            }
+        }
+        
+        return res;
+    }
+    
+    private boolean bfs_isBiPartite(ArrayList<Integer>[] graph, int src, int[] visited) {
+        int color = 0; // colors -> 0, 1
+        boolean isCycle = false, isBiPartite = true;
+        LinkedList<Integer> q = new LinkedList<>();
+        q.addLast(src);
+        visited[src] = color;
+        
+        while (!q.isEmpty()) {
+            int size = q.size();
+            while (size-- > 0) {
+                int rIdx = q.removeFirst();
+                
+                if (visited[rIdx] != -1) { // visited
+                    isCycle = true;
+                    if (visited[rIdx] != color) { // conflict
+                        isBiPartite = false;
+                        break;
+                    }
+                }
+                
+                visited[rIdx] = color;
+                
+                for (int v : graph[rIdx]) {
+                    if (visited[v] == -1)
+                        q.addLast(v);
+                }
+            }
+            color = (color+1) % 2; // switching colors @ each elvel
+            if (!isBiPartite)
+                break;
+        }
+        
+        if (isCycle) {
+            if (isBiPartite) 
+                System.out.println("Graph is BiPartite since the cycle is even length");
+            else 
+                System.out.println("Graph is not a BiPartite since the cycle is odd length");
+        }
+        else {
+            System.out.println("Graph is BiPartite since no cycle");
+        }
+        
+        return isBiPartite;
+    }
+    
+    private void addEdge(ArrayList<Integer>[] graph, int u, int v) {
+        graph[u].add(v);
+        graph[v].add(u);
+    }
+    
+    private ArrayList<Integer>[] constructGraph(int[][] dislikes, int n) {
+        ArrayList<Integer>[] graph = new ArrayList[n+1]; // why n+1, since n is 1-indexed
+        
+        for (int i = 0; i < graph.length; i++) 
+            graph[i] = new ArrayList<Integer>();
+        
+        for (int i = 0; i < dislikes.length; i++) 
+            addEdge(graph, dislikes[i][0], dislikes[i][1]);
+        
+        return graph;
     }
 
     // ---------------------------------------------------------------------------------------------------------

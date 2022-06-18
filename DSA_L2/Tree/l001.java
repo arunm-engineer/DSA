@@ -236,28 +236,27 @@ public class l001 {
     }
 
     // Alternative return logic of optimized
-    // public static int distanceKHelper(TreeNode root, int k, TreeNode target,
-    // ArrayList<Integer> ans) {
-    // if (root == null) return -1;
+    public static int distanceKHelper_01(TreeNode root, int k, TreeNode target, ArrayList<Integer> ans) {
+        if (root == null) return -1;
 
-    // if (root == target) {
-    // getkLevelsDownNodesHelper(root, k, ans, null);
-    // return k-1;
-    // }
+        if (root == target) {
+            getkLevelsDownNodesHelper(root, k, ans, null);
+            return k-1;
+        }
 
-    // int l = distanceKHelper(root.left, k, target, ans);
-    // if (l >= 0) {
-    // getkLevelsDownNodesHelper(root, l, ans, root.left);
-    // return l-1;
-    // }
-    // int r = distanceKHelper(root.right, k, target, ans);
-    // if (r >= 0) {
-    // getkLevelsDownNodesHelper(root, r, ans, root.right);
-    // return r-1;
-    // }
+        int l = distanceKHelper(root.left, k, target, ans);
+        if (l >= 0) {
+            getkLevelsDownNodesHelper(root, l, ans, root.left);
+            return l-1;
+        }
+        int r = distanceKHelper(root.right, k, target, ans);
+        if (r >= 0) {
+            getkLevelsDownNodesHelper(root, r, ans, root.right);
+            return r-1;
+        }
 
-    // return -1;
-    // }
+        return -1;
+    }
 
     /****************************************************************************************************/
 
@@ -331,9 +330,9 @@ public class l001 {
     }
 
     // Burning Tree Variation => Fire with water
-    public static ArrayList<ArrayList<Integer>> burningTree_02(TreeNode root, int target) {
+    public static ArrayList<ArrayList<Integer>> burningTree_02(TreeNode root, int target, HashSet<Integer> water) {
         ArrayList<ArrayList<Integer>> ans = new ArrayList<>();
-        burningTree_01_Helper(root, target, ans);
+        burningTree_02_Helper(root, target, ans, water);
         return ans;
     }
 

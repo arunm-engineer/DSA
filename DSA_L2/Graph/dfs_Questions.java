@@ -263,4 +263,67 @@ public class dfs_Questions {
 
     // ---------------------------------------------------------------------------------------------------------
 
+    // LC 785
+    public boolean isBipartite(int[][] graph) {
+        int n = graph.length;
+        
+        int[] visited = new int[n];
+        Arrays.fill(visited, -1);
+        
+        boolean res = true;
+        for (int i = 0; i < n; i++) {
+            if (visited[i] == -1) 
+                res = res && bfs_isBiPartite(graph, i, visited);                
+        }
+        
+        return res;
+    }
+    
+    private boolean bfs_isBiPartite(int[][] graph, int src, int[] visited) {
+        int color = 0; // colors -> 0, 1
+        boolean isCycle = false, isBiPartite = true;
+        LinkedList<Integer> q = new LinkedList<>();
+        q.addLast(src);
+        visited[src] = color;
+        
+        while (!q.isEmpty()) {
+            int size = q.size();
+            while (size-- > 0) {
+                int rIdx = q.removeFirst();
+                
+                if (visited[rIdx] != -1) { // visited
+                    isCycle = true;
+                    if (visited[rIdx] != color) { // conflict
+                        isBiPartite = false;
+                        break;
+                    }
+                }
+                
+                visited[rIdx] = color;
+                
+                for (int v : graph[rIdx]) {
+                    if (visited[v] == -1)
+                        q.addLast(v);
+                }
+            }
+            color = (color+1) % 2; // switching colors @ each elvel
+            if (!isBiPartite)
+                break;
+        }
+        
+        if (isCycle) {
+            if (isBiPartite) 
+                System.out.println("Graph is BiPartite since the cycle is even length");
+            else 
+                System.out.println("Graph is not a BiPartite since the cycle is odd length");
+        }
+        else {
+            System.out.println("Graph is BiPartite since no cycle");
+        }
+        
+        return isBiPartite;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
 }

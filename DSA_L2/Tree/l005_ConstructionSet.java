@@ -56,7 +56,7 @@ public class l005_ConstructionSet {
     static int preIdx;
     public static TreeNode constructBSTFromPreorder(int[] preorder, int leftRange, int rightRange) {
         if (preIdx == preorder.length || preorder[preIdx] < leftRange || preorder[preIdx] > rightRange) // not in range
-        return null;
+            return null;
         
         TreeNode root = new TreeNode(preorder[preIdx++]);
         root.left = constructBSTFromPreorder(preorder, leftRange, root.val);
