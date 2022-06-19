@@ -103,6 +103,47 @@ public class bfs_Questions {
         return bfs_02(mat);
     }
     
+    // TC O(n*m) ; SC O (2(n*m)) -> Queue Space + visited arr space
+    private int[][] bfs_01(int[][] grid) {
+        int[][] dir = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        
+        int n = grid.length, m = grid[0].length;
+        boolean[][] visited = new boolean[n][m];
+        LinkedList<Integer> q = new LinkedList<>();
+        
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid[i][j] == 0) { // add all zeroes, to propagate from those 0s to 1s
+                    visited[i][j] = true;
+                    q.addLast(i * m + j);
+                }
+            }
+        }
+        
+        while (!q.isEmpty()) {
+            int size = q.size();
+            while (size-- > 0) {
+                int idx = q.removeFirst();
+                int sr = idx / m, sc = idx % m;
+                
+                for (int d = 0; d < dir.length; d++) {
+                    int r = sr + dir[d][0];
+                    int c = sc + dir[d][1];
+                    
+                    // propagating only towards 1s, since 0s are already marked true
+                    if (r >= 0 && r < n && c >= 0 && c < m && visited[r][c] == false) {
+                        visited[r][c] = true;
+                        int parentLevel = grid[sr][sc];
+                        grid[r][c] = parentLevel+1; // updating curr by +1 level
+                        q.addLast(r * m + c);
+                    }
+                }
+            }
+        }
+        
+        return grid;
+    }
+
     // TC O(n*m) ; SC O(n*m) -> Queue space only
     private int[][] bfs_02(int[][] grid) {
         int[][] dir = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
@@ -149,46 +190,68 @@ public class bfs_Questions {
         
         return grid;
     }
-    
-    // TC O(n*m) ; SC O (2(n*m)) -> Queue Space + visited arr space
-    private int[][] bfs_01(int[][] grid) {
-        int[][] dir = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // LC 785
+    public boolean isBipartite(int[][] graph) {
+        int n = graph.length;
         
-        int n = grid.length, m = grid[0].length;
-        boolean[][] visited = new boolean[n][m];
-        LinkedList<Integer> q = new LinkedList<>();
+        int[] visited = new int[n];
+        Arrays.fill(visited, -1);
         
+        boolean res = true;
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (grid[i][j] == 0) { // add all zeroes, to propagate from those 0s to 1s
-                    visited[i][j] = true;
-                    q.addLast(i * m + j);
-                }
-            }
+            if (visited[i] == -1) 
+                res = res && bfs_isBiPartite(graph, i, visited);                
         }
+        
+        return res;
+    }
+    
+    private boolean bfs_isBiPartite(int[][] graph, int src, int[] visited) {
+        int color = 0; // colors -> 0, 1
+        boolean isCycle = false, isBiPartite = true;
+        LinkedList<Integer> q = new LinkedList<>();
+        q.addLast(src);
+        visited[src] = color;
         
         while (!q.isEmpty()) {
             int size = q.size();
             while (size-- > 0) {
-                int idx = q.removeFirst();
-                int sr = idx / m, sc = idx % m;
+                int rIdx = q.removeFirst();
                 
-                for (int d = 0; d < dir.length; d++) {
-                    int r = sr + dir[d][0];
-                    int c = sc + dir[d][1];
-                    
-                    // propagating only towards 1s, since 0s are already marked true
-                    if (r >= 0 && r < n && c >= 0 && c < m && visited[r][c] == false) {
-                        visited[r][c] = true;
-                        int parentLevel = grid[sr][sc];
-                        grid[r][c] = parentLevel+1; // updating curr by +1 level
-                        q.addLast(r * m + c);
+                if (visited[rIdx] != -1) { // visited
+                    isCycle = true;
+                    if (visited[rIdx] != color) { // conflict
+                        isBiPartite = false;
+                        break;
                     }
                 }
+                
+                visited[rIdx] = color;
+                
+                for (int v : graph[rIdx]) {
+                    if (visited[v] == -1)
+                        q.addLast(v);
+                }
             }
+            color = (color+1) % 2; // switching colors @ each elvel
+            if (!isBiPartite)
+                break;
         }
         
-        return grid;
+        if (isCycle) {
+            if (isBiPartite) 
+                System.out.println("Graph is BiPartite since the cycle is even length");
+            else 
+                System.out.println("Graph is not a BiPartite since the cycle is odd length");
+        }
+        else {
+            System.out.println("Graph is BiPartite since no cycle");
+        }
+        
+        return isBiPartite;
     }
 
     // ---------------------------------------------------------------------------------------------------------
@@ -271,6 +334,43 @@ public class bfs_Questions {
             addEdge(graph, dislikes[i][0], dislikes[i][1]);
         
         return graph;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // LC 286
+    // LintCode 663
+    // Concept and technique similar to LC 542
+    public void wallsAndGates(int[][] rooms) {
+        int n = rooms.length, m = rooms[0].length;
+        int[][] dir = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        LinkedList<Integer> q = new LinkedList<>();
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (rooms[i][j] == 0) 
+                    q.addLast(i * m + j);
+            }
+        }
+
+        while (!q.isEmpty()) {
+            int size = q.size();
+            while (size-- > 0) {
+                int remIdx = q.removeFirst();
+                int sr = remIdx / m, sc = remIdx % m;
+
+                for (int d = 0; d < dir.length; d++) {
+                    int r = sr + dir[d][0];
+                    int c = sc + dir[d][1];
+
+                    if (r >= 0 && r < n && c >= 0 && c < m && rooms[r][c] == Integer.MAX_VALUE) {
+                        q.add(r * m + c);
+                        int parentDistance = rooms[sr][sc];
+                        rooms[r][c] = parentDistance + 1;
+                    }
+                }
+            }
+        }
     }
 
     // ---------------------------------------------------------------------------------------------------------

@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+// Note: If vertexes are not interms of indexes like 0, 1, 2,.... then we will use HashMap to store it as vertexes
 public class l001 {
     public static class Edge {
         int v = 0;
