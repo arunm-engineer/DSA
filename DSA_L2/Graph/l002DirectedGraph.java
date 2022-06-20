@@ -222,6 +222,58 @@ public class l002DirectedGraph {
 
     // ---------------------------------------------------------------------------------------------------------
 
+    // LC 329
+    // BFS Kahn's Algo in 2D Array
+    public int longestIncreasingPath(int[][] matrix) {
+        int n = matrix.length, m = matrix[0].length;
+        int[][] dir = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        LinkedList<Integer> q = new LinkedList<>();
+        
+        // Calc indegree
+        int[][] indegree = new int[n][m];
+        for (int sr = 0; sr < n; sr++) {
+            for (int sc = 0; sc < m; sc++) {
+                for (int d = 0; d < dir.length; d++) {
+                    int r = sr + dir[d][0];
+                    int c = sc + dir[d][1];
+                    
+                    if (r >= 0 && r < n && c >= 0 && c < m && matrix[sr][sc] > matrix[r][c])
+                        indegree[sr][sc]++; // calc indegree coming on me (sr,sc) via nbrs
+                }
+                // find indegree => (performing indegree here itself saving a useless loop later)
+                if (indegree[sr][sc] == 0) // since
+                    q.addLast(sr * m + sc);
+            }
+        }        
+        
+        // BFS
+        int level = 0;
+        while (!q.isEmpty()) {
+            int size = q.size();
+            
+            while (size-- > 0) {
+                int rvtx = q.removeFirst();
+                int sr = rvtx / m, sc = rvtx % m;
+                
+                for (int d = 0; d < dir.length; d++) {
+                    int r = sr + dir[d][0];
+                    int c = sc + dir[d][1];
+                    
+                    if (r >= 0 && r < n && c >= 0 && c < m && matrix[r][c] > matrix[sr][sc]) {
+                        if (--indegree[r][c] == 0)
+                            q.addLast(r * m + c);
+                    }
+                }
+            }
+            
+            level++;
+        }
+        
+        return level;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
     public static void constructGraph() {
         int N = 7;
         ArrayList<Edge>[] graph = new ArrayList[N];
