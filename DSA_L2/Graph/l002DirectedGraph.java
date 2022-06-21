@@ -274,6 +274,44 @@ public class l002DirectedGraph {
 
     // ---------------------------------------------------------------------------------------------------------
 
+    // For directed graph
+    // -1 -> unvisited, 0 -> current path, 1 -> backtrack
+    public static boolean dfs_Topo_isCycle(ArrayList<Edge>[] graph, int src, int[] visited, ArrayList<Integer> topoOrder) {
+        visited[src] = 0;
+        boolean res = false;
+        for (Edge e : graph[src]) {
+            if (visited[e.v] == -1) {
+                res = res || dfs_Topo_isCycle(graph, e.v, visited, topoOrder);
+            }
+            else if (visited[e.v] == 0) {
+                return true;
+            }
+        }
+
+        visited[src] = 1;
+        topoOrder.add(src);
+        return res;
+    }
+
+    public static ArrayList<Integer> dfs_Topo_isCycle(ArrayList<Edge>[] graph) {
+        int N = graph.length;
+        int[] visited = new int[N];
+        ArrayList<Integer> topoOrder = new ArrayList<>();
+
+        boolean isCycle = false;
+        for (int i = 0; i < N; i++) {
+            if (visited[i] == -1)
+                isCycle = isCycle || dfs_Topo_isCycle(graph, i, visited, topoOrder);
+        }
+
+        if (isCycle)
+            topoOrder.clear();
+
+        return topoOrder;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
     public static void constructGraph() {
         int N = 7;
         ArrayList<Edge>[] graph = new ArrayList[N];
