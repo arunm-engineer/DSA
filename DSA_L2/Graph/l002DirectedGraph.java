@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 // Note: If vertexes are not interms of indexes like 0, 1, 2,.... then we will use HashMap to store it as vertexes
@@ -274,7 +275,7 @@ public class l002DirectedGraph {
 
     // ---------------------------------------------------------------------------------------------------------
 
-    // For directed graph
+    // Topological Order in directed graph (Also Cycle detection in directed Graph using DFS)
     // -1 -> unvisited, 0 -> current path, 1 -> backtrack
     public static boolean dfs_Topo_isCycle(ArrayList<Edge>[] graph, int src, int[] visited, ArrayList<Integer> topoOrder) {
         visited[src] = 0;
@@ -296,6 +297,7 @@ public class l002DirectedGraph {
     public static ArrayList<Integer> dfs_Topo_isCycle(ArrayList<Edge>[] graph) {
         int N = graph.length;
         int[] visited = new int[N];
+        Arrays.fill(visited, -1);
         ArrayList<Integer> topoOrder = new ArrayList<>();
 
         boolean isCycle = false;
@@ -308,6 +310,145 @@ public class l002DirectedGraph {
             topoOrder.clear();
 
         return topoOrder;
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // LC 207
+    // Using DFS
+    public boolean canFinish_00(int numCourses, int[][] prerequisites) {
+        ArrayList<Integer>[] graph = constructGraph_02(numCourses, prerequisites);
+        ArrayList<Integer> ans = dfs_Topo_isCycle_00(graph);
+        
+        return ans.size() != 0;
+    }
+    
+    private ArrayList<Integer> dfs_Topo_isCycle_00(ArrayList<Integer>[] graph) {
+        int N = graph.length;
+        int[] visited = new int[N];
+        Arrays.fill(visited, -1);
+        ArrayList<Integer> topoOrder = new ArrayList<>();
+
+        boolean isCycle = false;
+        for (int i = 0; i < N; i++) {
+            if (visited[i] == -1)
+                isCycle = isCycle || dfs_Topo_isCycle_00(graph, i, visited, topoOrder);
+        }
+
+        if (isCycle)
+            topoOrder.clear();
+
+        return topoOrder;
+    }
+    
+    private boolean dfs_Topo_isCycle_00(ArrayList<Integer>[] graph, int src, int[] visited, ArrayList<Integer> topoOrder) {
+        visited[src] = 0;
+        boolean res = false;
+        for (int v : graph[src]) {
+            if (visited[v] == -1) {
+                res = res || dfs_Topo_isCycle_00(graph, v, visited, topoOrder);
+            }
+            else if (visited[v] == 0) {
+                return true;
+            }
+        }
+
+        visited[src] = 1;
+        topoOrder.add(src);
+        return res;
+    }
+    
+    private ArrayList<Integer>[] constructGraph_02(int N, int[][] prerequisites) {
+        ArrayList<Integer>[] graph = new ArrayList[N];
+        for (int i = 0; i < N; i++)
+            graph[i] = new ArrayList<>();
+        
+        for (int i = 0; i < prerequisites.length; i++) {
+            int u = prerequisites[i][0];
+            int v = prerequisites[i][1];
+            
+            addEdge_02(graph, u, v);
+        }
+
+        return graph;
+    }
+    
+    private void addEdge_02(ArrayList<Integer>[] graph, int u, int v) {
+        graph[u].add(v);
+    }
+
+    // ---------------------------------------------------------------------------------------------------------
+
+    // LC 210
+    // Using DFS
+    public int[] findOrder_00(int numCourses, int[][] prerequisites) {
+        ArrayList<Integer>[] graph = constructGraph_03(numCourses, prerequisites);
+        ArrayList<Integer> topoOrder = dfs_Topo_isCycle_01(graph);
+        int[] ans = fillArray(topoOrder);
+        
+        return ans;
+    }
+    
+    private ArrayList<Integer> dfs_Topo_isCycle_01(ArrayList<Integer>[] graph) {
+        int N = graph.length;
+        int[] visited = new int[N];
+        Arrays.fill(visited, -1);
+        ArrayList<Integer> topoOrder = new ArrayList<>();
+
+        boolean isCycle = false;
+        for (int i = 0; i < N; i++) {
+            if (visited[i] == -1)
+                isCycle = isCycle || dfs_Topo_isCycle_01(graph, i, visited, topoOrder);
+        }
+
+        if (isCycle)
+            topoOrder.clear();
+
+        return topoOrder;
+    }
+    
+    private boolean dfs_Topo_isCycle_01(ArrayList<Integer>[] graph, int src, int[] visited, ArrayList<Integer> topoOrder) {
+        visited[src] = 0;
+        boolean res = false;
+        for (int v : graph[src]) {
+            if (visited[v] == -1) {
+                res = res || dfs_Topo_isCycle_01(graph, v, visited, topoOrder);
+            }
+            else if (visited[v] == 0) {
+                return true;
+            }
+        }
+
+        visited[src] = 1;
+        topoOrder.add(src);
+        return res;
+    }
+    
+    private int[] fillArray(ArrayList<Integer> topoOrder) {
+        int n = topoOrder.size();
+        int[] ans = new int[n];
+        for (int i = 0; i < n; i++)
+           ans[i] = topoOrder.get(i);
+        return ans;
+    }
+    
+    private ArrayList<Integer>[] constructGraph_03(int N, int[][] prerequisites) {
+        ArrayList<Integer>[] graph = new ArrayList[N];
+        for (int i = 0; i < N; i++)
+            graph[i] = new ArrayList<>();
+        
+        for (int i = 0; i < prerequisites.length; i++) {
+            int u = prerequisites[i][0];
+            int v = prerequisites[i][1];
+            
+            addEdge_03(graph, u, v);
+        }
+
+        return graph;
+    }
+    
+    private void addEdge_03(ArrayList<Integer>[] graph, int u, int v) {
+        graph[u].add(v);
     }
 
     // ---------------------------------------------------------------------------------------------------------

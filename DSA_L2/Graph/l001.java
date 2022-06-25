@@ -107,6 +107,7 @@ public class l001 {
 
     // ---------------------------------------------------------------------------------------------------------
 
+    // GCC -> Get Connected Components
     public static void dfs_GCC(ArrayList<Edge>[] graph, int src, boolean[] visited) {
         visited[src] = true;
         for (Edge e : graph[src]) {
