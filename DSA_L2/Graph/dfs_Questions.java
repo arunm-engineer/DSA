@@ -38,6 +38,7 @@ public class dfs_Questions {
     // LC 695
     // Interms of matrix TC O(n*m); Interms of Edges TC O(E+V)
     public int maxAreaOfIsland(int[][] grid) {
+        // Refer notes index page, for why not using only 2-directions(top, down) since we're travelling from top-left to bottom-right
         int[][] dir = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
         
         int maxArea = 0;

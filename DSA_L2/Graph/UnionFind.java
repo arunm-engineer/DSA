@@ -34,8 +34,9 @@ public class UnionFind {
 
     // =========================================================
 
-    static int[] parent, size;
+    public static int[] parent, size;
 
+    // TC O(4) => Stated by Inverse Ackermann Function
     public static int findParent(int u) {
         if (parent[u] == u)
             return u;
@@ -43,7 +44,7 @@ public class UnionFind {
         return parent[u] = findParent(parent[u]); // Path Compression
         
         // one-liner
-        // return parent[u] = parent[u] == u ? u : findParent(parent[u]);
+        // return parent[u] = parent[u] == u ? u : (parent[u] = findParent(parent[u]));
     }
 
     public static void union(int parent1, int parent2) {
@@ -57,7 +58,7 @@ public class UnionFind {
         }
     }
     
-    // edges => [[u1, v1, w1], [u2, v2, w2],...]
+    // edges given => [[u1, v1, w1], [u2, v2, w2],...]
     public static void unionFind(int[][] edges, int N) {
         ArrayList<Edge>[] graph = new ArrayList[N];
         for (int i = 0; i < N; i++)
@@ -65,7 +66,7 @@ public class UnionFind {
         
         boolean isCycle = false; // Detect cycle
 
-        for (int[] e : edges) {
+        for (int[] e : edges) { // order of picking edges doesn't matter
             int u = e[0], v = e[1], w = e[2];
             int parent1 = findParent(u); // parent => Global leader
             int parent2 = findParent(v);
