@@ -9,7 +9,8 @@ public class l002DirectedGraph {
         int v = 0;
         int w = 0;
 
-        public Edge() {}
+        public Edge() {
+        }
 
         public Edge(int v, int w) {
             this.v = v;
@@ -21,12 +22,13 @@ public class l002DirectedGraph {
         graph[u].add(new Edge(v, w));
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     public static void dfs_TopologicalOrder(ArrayList<Edge>[] graph) {
         int N = graph.length;
         boolean[] visited = new boolean[N];
-        ArrayList<Integer> ans = new ArrayList<>(); // Using ArrayList in place of stack, so that I can traverse on it anytime to find the topological order
+        ArrayList<Integer> ans = new ArrayList<>(); // Using ArrayList in place of stack, so that I can traverse on it
+                                                    // anytime to find the topological order
 
         for (int i = 0; i < N; i++) {
             if (!visited[i])
@@ -42,10 +44,11 @@ public class l002DirectedGraph {
                 dfs_topo(graph, e.v, visited, ans);
         }
 
-        ans.add(src); // adding in post order, since topological is all about resolving dependency and then finding the order
+        ans.add(src); // adding in post order, since topological is all about resolving dependency and
+                      // then finding the order
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     // Kahn's Algorithm
     // Used for Topological Order and Cycle Detection in Directed graph using BFS
@@ -57,7 +60,8 @@ public class l002DirectedGraph {
         ArrayList<Integer> ans = new ArrayList<>(); // stores the topological order
 
         // Calculating indegree => num of dependencies on each vertexes
-        // TC O(E) => not O(2E) why? since this is directional graph, for bi-directional grraph we have O(2E) complexity
+        // TC O(E) => not O(2E) why? since this is directional graph, for bi-directional
+        // grraph we have O(2E) complexity
         for (int i = 0; i < N; i++) {
             for (Edge e : graph[i])
                 indegree[e.v]++;
@@ -83,23 +87,24 @@ public class l002DirectedGraph {
             }
         }
 
-        // if num of vertexes in graph = num of vertexes in ans (means no cycle) => only then return ans with topological order formed
+        // if num of vertexes in graph = num of vertexes in ans (means no cycle) => only
+        // then return ans with topological order formed
         if (ans.size() != N)
             ans.clear();
 
         return ans;
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     // LC 207
     public boolean canFinish(int numCourses, int[][] prerequisites) {
         ArrayList<Integer>[] graph = constructGraph_00(numCourses, prerequisites);
         ArrayList<Integer> ans = Kahns_Algo_BFS_TopologicalOrder_00(graph);
-        
+
         return ans.size() != 0;
     }
-    
+
     // Kahn's Algorithm
     private ArrayList<Integer> Kahns_Algo_BFS_TopologicalOrder_00(ArrayList<Integer>[] graph) {
         int N = graph.length;
@@ -134,44 +139,44 @@ public class l002DirectedGraph {
 
         return ans;
     }
-    
+
     private ArrayList<Integer>[] constructGraph_00(int N, int[][] prerequisites) {
         ArrayList<Integer>[] graph = new ArrayList[N];
         for (int i = 0; i < N; i++)
             graph[i] = new ArrayList<>();
-        
+
         for (int i = 0; i < prerequisites.length; i++) {
             int u = prerequisites[i][0];
             int v = prerequisites[i][1];
-            
+
             addEdge_00(graph, u, v);
         }
 
         return graph;
     }
-    
+
     private void addEdge_00(ArrayList<Integer>[] graph, int u, int v) {
         graph[u].add(v);
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     // LC 210
     public int[] findOrder(int numCourses, int[][] prerequisites) {
         ArrayList<Integer>[] graph = constructGraph_01(numCourses, prerequisites);
         int[] ans = Kahns_Algo_BFS_TopologicalOrder_01(graph);
-        
+
         return ans;
     }
-    
+
     // Kahn's Algorithm
     private int[] Kahns_Algo_BFS_TopologicalOrder_01(ArrayList<Integer>[] graph) {
         int N = graph.length;
         int[] indegree = new int[N];
         LinkedList<Integer> q = new LinkedList<>();
-        
-        
-        int idx = N-1; // used to fill vertexes in ans arr in dependency order first (opp. to topo order)
+
+        int idx = N - 1; // used to fill vertexes in ans arr in dependency order first (opp. to topo
+                         // order)
         int[] ans = new int[N];
 
         for (int i = 0; i < N; i++) {
@@ -201,35 +206,35 @@ public class l002DirectedGraph {
 
         return ans;
     }
-    
+
     private ArrayList<Integer>[] constructGraph_01(int N, int[][] prerequisites) {
         ArrayList<Integer>[] graph = new ArrayList[N];
         for (int i = 0; i < N; i++)
             graph[i] = new ArrayList<>();
-        
+
         for (int i = 0; i < prerequisites.length; i++) {
             int u = prerequisites[i][0];
             int v = prerequisites[i][1];
-            
+
             addEdge_01(graph, u, v);
         }
 
         return graph;
     }
-    
+
     private void addEdge_01(ArrayList<Integer>[] graph, int u, int v) {
         graph[u].add(v);
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     // LC 329
     // BFS Kahn's Algo in 2D Array
     public int longestIncreasingPath(int[][] matrix) {
         int n = matrix.length, m = matrix[0].length;
-        int[][] dir = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
+        int[][] dir = { { -1, 0 }, { 0, 1 }, { 1, 0 }, { 0, -1 } };
         LinkedList<Integer> q = new LinkedList<>();
-        
+
         // Calc indegree
         int[][] indegree = new int[n][m];
         for (int sr = 0; sr < n; sr++) {
@@ -237,54 +242,56 @@ public class l002DirectedGraph {
                 for (int d = 0; d < dir.length; d++) {
                     int r = sr + dir[d][0];
                     int c = sc + dir[d][1];
-                    
+
                     if (r >= 0 && r < n && c >= 0 && c < m && matrix[sr][sc] > matrix[r][c])
                         indegree[sr][sc]++; // calc indegree coming on me (sr,sc) via nbrs
                 }
-                // find indegree => (performing indegree here itself saving a useless loop later)
+                // find indegree => (performing indegree here itself saving a useless loop
+                // later)
                 if (indegree[sr][sc] == 0) // since
                     q.addLast(sr * m + sc);
             }
-        }        
-        
+        }
+
         // BFS
         int level = 0;
         while (!q.isEmpty()) {
             int size = q.size();
-            
+
             while (size-- > 0) {
                 int rvtx = q.removeFirst();
                 int sr = rvtx / m, sc = rvtx % m;
-                
+
                 for (int d = 0; d < dir.length; d++) {
                     int r = sr + dir[d][0];
                     int c = sc + dir[d][1];
-                    
+
                     if (r >= 0 && r < n && c >= 0 && c < m && matrix[r][c] > matrix[sr][sc]) {
                         if (--indegree[r][c] == 0)
                             q.addLast(r * m + c);
                     }
                 }
             }
-            
+
             level++;
         }
-        
+
         return level;
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
-    // Topological Order in directed graph (Also Cycle detection in directed Graph using DFS)
+    // Topological Order in directed graph (Also Cycle detection in directed Graph
+    // using DFS)
     // -1 -> unvisited, 0 -> current path, 1 -> backtrack
-    public static boolean dfs_Topo_isCycle(ArrayList<Edge>[] graph, int src, int[] visited, ArrayList<Integer> topoOrder) {
+    public static boolean dfs_Topo_isCycle(ArrayList<Edge>[] graph, int src, int[] visited,
+            ArrayList<Integer> topoOrder) {
         visited[src] = 0;
         boolean res = false;
         for (Edge e : graph[src]) {
             if (visited[e.v] == -1) {
                 res = res || dfs_Topo_isCycle(graph, e.v, visited, topoOrder);
-            }
-            else if (visited[e.v] == 0) {
+            } else if (visited[e.v] == 0) {
                 return true;
             }
         }
@@ -312,17 +319,17 @@ public class l002DirectedGraph {
         return topoOrder;
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     // LC 207
     // Using DFS
     public boolean canFinish_00(int numCourses, int[][] prerequisites) {
         ArrayList<Integer>[] graph = constructGraph_02(numCourses, prerequisites);
         ArrayList<Integer> ans = dfs_Topo_isCycle_00(graph);
-        
+
         return ans.size() != 0;
     }
-    
+
     private ArrayList<Integer> dfs_Topo_isCycle_00(ArrayList<Integer>[] graph) {
         int N = graph.length;
         int[] visited = new int[N];
@@ -340,15 +347,15 @@ public class l002DirectedGraph {
 
         return topoOrder;
     }
-    
-    private boolean dfs_Topo_isCycle_00(ArrayList<Integer>[] graph, int src, int[] visited, ArrayList<Integer> topoOrder) {
+
+    private boolean dfs_Topo_isCycle_00(ArrayList<Integer>[] graph, int src, int[] visited,
+            ArrayList<Integer> topoOrder) {
         visited[src] = 0;
         boolean res = false;
         for (int v : graph[src]) {
             if (visited[v] == -1) {
                 res = res || dfs_Topo_isCycle_00(graph, v, visited, topoOrder);
-            }
-            else if (visited[v] == 0) {
+            } else if (visited[v] == 0) {
                 return true;
             }
         }
@@ -357,27 +364,27 @@ public class l002DirectedGraph {
         topoOrder.add(src);
         return res;
     }
-    
+
     private ArrayList<Integer>[] constructGraph_02(int N, int[][] prerequisites) {
         ArrayList<Integer>[] graph = new ArrayList[N];
         for (int i = 0; i < N; i++)
             graph[i] = new ArrayList<>();
-        
+
         for (int i = 0; i < prerequisites.length; i++) {
             int u = prerequisites[i][0];
             int v = prerequisites[i][1];
-            
+
             addEdge_02(graph, u, v);
         }
 
         return graph;
     }
-    
+
     private void addEdge_02(ArrayList<Integer>[] graph, int u, int v) {
         graph[u].add(v);
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     // LC 210
     // Using DFS
@@ -385,10 +392,10 @@ public class l002DirectedGraph {
         ArrayList<Integer>[] graph = constructGraph_03(numCourses, prerequisites);
         ArrayList<Integer> topoOrder = dfs_Topo_isCycle_01(graph);
         int[] ans = fillArray(topoOrder);
-        
+
         return ans;
     }
-    
+
     private ArrayList<Integer> dfs_Topo_isCycle_01(ArrayList<Integer>[] graph) {
         int N = graph.length;
         int[] visited = new int[N];
@@ -406,15 +413,15 @@ public class l002DirectedGraph {
 
         return topoOrder;
     }
-    
-    private boolean dfs_Topo_isCycle_01(ArrayList<Integer>[] graph, int src, int[] visited, ArrayList<Integer> topoOrder) {
+
+    private boolean dfs_Topo_isCycle_01(ArrayList<Integer>[] graph, int src, int[] visited,
+            ArrayList<Integer> topoOrder) {
         visited[src] = 0;
         boolean res = false;
         for (int v : graph[src]) {
             if (visited[v] == -1) {
                 res = res || dfs_Topo_isCycle_01(graph, v, visited, topoOrder);
-            }
-            else if (visited[v] == 0) {
+            } else if (visited[v] == 0) {
                 return true;
             }
         }
@@ -423,35 +430,35 @@ public class l002DirectedGraph {
         topoOrder.add(src);
         return res;
     }
-    
+
     private int[] fillArray(ArrayList<Integer> topoOrder) {
         int n = topoOrder.size();
         int[] ans = new int[n];
         for (int i = 0; i < n; i++)
-           ans[i] = topoOrder.get(i);
+            ans[i] = topoOrder.get(i);
         return ans;
     }
-    
+
     private ArrayList<Integer>[] constructGraph_03(int N, int[][] prerequisites) {
         ArrayList<Integer>[] graph = new ArrayList[N];
         for (int i = 0; i < N; i++)
             graph[i] = new ArrayList<>();
-        
+
         for (int i = 0; i < prerequisites.length; i++) {
             int u = prerequisites[i][0];
             int v = prerequisites[i][1];
-            
+
             addEdge_03(graph, u, v);
         }
 
         return graph;
     }
-    
+
     private void addEdge_03(ArrayList<Integer>[] graph, int u, int v) {
         graph[u].add(v);
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     public static void constructGraph() {
         int N = 7;
