@@ -71,7 +71,7 @@ public class dsuQuestions {
             int parent1 = findParent_01(u);
             int parent2 = findParent_01(v);
 
-            // since cycle doesn't matter so don't need to use "if", also == condition is also handled
+            // since cycle doesn't matter so don't need to use "if", also p1 == p2 condition is also handled (since the same parent will be set again which will not be an issue - just clean code)
             parent_01[parent1] = Math.min(parent1, parent2);
             parent_01[parent2] = Math.min(parent1, parent2);
         }
@@ -127,6 +127,52 @@ public class dsuQuestions {
 
     private int findParent_02(int u) {
         return parent_02[u] == u ? u : (parent_02[u] = findParent_02(parent_02[u]));
+    }
+
+    // ==================================================================
+
+    // LC 839
+    private int[] parent_03;
+    
+    public int numSimilarGroups(String[] strs) {
+        int n = strs.length;
+        int groups = n;
+        parent_03 = new int[n];
+        
+        for (int i = 0; i < n; i++)
+            parent_03[i] = i;
+        
+        for (int i = 0; i < n; i++) {
+            for (int j = i+1; j < n; j++) {
+                if (areSimilarStrings(strs[i], strs[j])) { 
+                    int u = i, v = j;
+                    int parent1 = findParent_03(u);
+                    int parent2 = findParent_03(v);
+                    
+                    // union (merge)
+                    if (parent1 != parent2) {
+                        parent_03[parent1] = parent2;
+                        groups--;    
+                    }
+                }
+            }
+        }
+        
+        return groups;
+    }
+    
+    private boolean areSimilarStrings(String s1, String s2) {
+        int count = 0;
+        for (int i = 0; i < s1.length(); i++) {
+            if (s1.charAt(i) != s2.charAt(i) && ++count > 2) // means will take more than swaps to convert
+                return false;
+        }
+        
+        return true;
+    }
+    
+    private int findParent_03(int u) {
+        return parent_03[u] == u ? u : (parent_03[u] = findParent_03(parent_03[u]));
     }
 
     // ==================================================================
