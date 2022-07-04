@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.BaseStream;
 
 public class dsuQuestions {
 
@@ -228,5 +227,45 @@ public class dsuQuestions {
     private int findParent_04(int u) {
         return parent_04[u] == u ? u : (parent_04[u] = findParent_04(parent_04[u]));
     }
+
+    /****************************************************************************************************/
+
+    // LC 684
+    private int[] parent_05;
+    
+    public int[] findRedundantConnection(int[][] edges) {
+        // Why using DSU?
+        // if extra edge means it will connect with some vertice within
+        // And ultimately this will lead to cycle formation
+        
+        int N = edges.length; // this holds true as per the question
+        parent_05 = new int[N+1];
+        
+        for (int i = 1; i <= N; i++)
+            parent_05[i] = i;
+        
+        int[] extraEdge = null; // stores that extra edge 
+        
+        for (int[] e : edges) {
+            int u = e[0], v = e[1];
+            
+            int p1 = findParent_05(u);
+            int p2 = findParent_05(v);
+            
+            
+            if (p1 != p2) 
+                parent_05[p1] = p2; // union, not worrying about size factor
+            else 
+                extraEdge = e; // cycle, means found that extra edge
+        }
+        
+        return extraEdge;
+    }
+    
+    private int findParent_05(int u) {
+        return parent_05[u] == u ? u : (parent_05[u] = findParent_05(parent_05[u]));
+    }
+
+    /****************************************************************************************************/
 
 }
