@@ -268,4 +268,61 @@ public class dsuQuestions {
 
     /****************************************************************************************************/
 
+    // LC 959
+    // Using DSU
+    private int[] parent;
+    public int regionsBySlashes(String[] grid) {
+        int n = grid.length;
+        int m = n + 1;
+        
+        parent = new int[m * m]; // n & m same as per constraints given
+        
+        for (int i = 0; i < m * m; i++) {
+            parent[i] = i;
+            
+            int r = i / m, c = i % m;
+            if (r == 0 || r == m-1 || c == 0 || c == m-1)
+                parent[i] = 0; // connect by making a global parent for the boundary regions
+        }
+        
+        int regions = 1; // initially after joining all boundaries we will have 1 region by default
+        for (int i = 0; i < grid.length; i++) {
+            String s = grid[i];
+            for (int j = 0; j < s.length(); j++) {
+                char ch = s.charAt(j);
+                int p1 = -(int) 1e9, p2 = -(int) 1e9;
+                
+                if (ch == '/') {
+                    // For (x, y) -> (x, y+1) (x+1, y)
+                    int u = i * m + j + 1;
+                    int v = (i+1) * m + j;
+                    p1 = findParent(u);
+                    p2 = findParent(v);
+                }
+                else if (ch == '\\') { // this format will come as one single char bcoz of escape sequence
+                    // For (x, y) -> (x, y) (x+1, y+1)
+                    int u = i * m + j;
+                    int v = (i + 1) * m + j + 1;
+                    p1 = findParent(u);
+                    p2 = findParent(v);
+                }
+                else // means empty space -> ' '
+                    continue;
+                
+                if (p1 != p2) 
+                    parent[p1]= p2;
+                else // a cycle indicates two boundaries have touched which will partition a new region
+                    regions++;
+            }            
+        }
+        
+        return regions;
+    }
+    
+    private int findParent(int u) {
+        return parent[u] == u ? u : (parent[u] = findParent(parent[u]));
+    }
+
+    /****************************************************************************************************/
+
 }

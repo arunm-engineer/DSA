@@ -55,7 +55,7 @@ public class bfs_Questions {
         return -1; // means more freshOranges are left, which couldn't be reached
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     // LC 1091
     public int shortestPathBinaryMatrix(int[][] grid) {
@@ -95,7 +95,7 @@ public class bfs_Questions {
         return -1;
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     // LC 542
     public int[][] updateMatrix(int[][] mat) {
@@ -191,7 +191,7 @@ public class bfs_Questions {
         return grid;
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     // LC 785
     public boolean isBipartite(int[][] graph) {
@@ -254,7 +254,7 @@ public class bfs_Questions {
         return isBiPartite;
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     // LC 886
     public boolean possibleBipartition(int n, int[][] dislikes) {
@@ -336,7 +336,7 @@ public class bfs_Questions {
         return graph;
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
 
     // LC 286
     // LintCode 663
@@ -373,6 +373,67 @@ public class bfs_Questions {
         }
     }
 
-    // ---------------------------------------------------------------------------------------------------------
+    /****************************************************************************************************/
+
+    // LC 815
+    // BFS
+    public int numBusesToDestination(int[][] routes, int source, int target) {
+        if (source == target) // edge case
+            return 0;
+        
+        int n = routes.length;
+        
+        // Map <BustStand, Buses> (Here buses indicates buses which travel from that BusStand)
+        HashMap<Integer, ArrayList<Integer>> map = new HashMap<>();
+        
+        // Form relation for all buses travelling from each busStands
+        for (int bus = 0; bus < routes.length; bus++) {
+            for (int busStand : routes[bus]) {
+                map.putIfAbsent(busStand, new ArrayList<>());
+                map.get(busStand).add(bus);
+            }
+        }
+
+        boolean[] busVisited = new boolean[n]; // track buses used
+        HashSet<Integer> busStandVisited = new HashSet<>(); // track busStands, buses used have travelled
+        
+        LinkedList<Integer> q = new LinkedList<>();
+        q.add(source);
+        busStandVisited.add(source);
+        
+        int busInterchangesDoneSoFar = 0;
+        
+        while (!q.isEmpty()) {
+            int size = q.size();
+            
+            while (size-- > 0) {
+                int busStand = q.removeFirst();
+                for (int bus : map.get(busStand)) {
+                    
+                    if (busVisited[bus]) // if bus already visited, means upcoming stands also visited
+                        continue;
+                    
+                    busVisited[bus] = true; // mark bus as used
+                    
+                    // travel, mark, find all further bus stands of bus's routes for (src == dest)
+                    for (int upcomingBusStand : routes[bus]) {
+                        if (!busStandVisited.contains(upcomingBusStand)) {
+                            q.addLast(upcomingBusStand);
+                            busStandVisited.add(upcomingBusStand);
+                            
+                            if (upcomingBusStand == target)
+                                return busInterchangesDoneSoFar+1;
+                        }
+                    }
+                }
+            }
+            
+            busInterchangesDoneSoFar++;
+        }
+        
+        return -1;
+    }
+
+    /****************************************************************************************************/
     
 }

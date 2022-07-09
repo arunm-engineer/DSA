@@ -77,7 +77,7 @@ public class MST_questions {
             }
         }
 
-        if (totalComponents != 1)
+        if (totalComponents > 1)
             return -1;
 
         int superRoadsConverted = 0;
@@ -94,5 +94,7 @@ public class MST_questions {
     private int findParent_01(int u) {
         return parent_01[u] == u ? u : (parent_01[u] = findParent_01(parent_01[u]));
     }
+
+    /****************************************************************************************************/
 
 }
