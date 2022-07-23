@@ -1,8 +1,9 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
-public class MST_questions {
+public class AlgoQuestions {
     
     // LC 1168
     // Using Kruskal MST Algo
@@ -93,6 +94,63 @@ public class MST_questions {
 
     private int findParent_01(int u) {
         return parent_01[u] == u ? u : (parent_01[u] = findParent_01(parent_01[u]));
+    }
+
+    /****************************************************************************************************/
+
+    // LC 1192
+    // Articulation Edges
+    private int[] low, disc;
+    private boolean[] visited;
+    private int time;
+    
+    public List<List<Integer>> criticalConnections(int N, List<List<Integer>> connections) {
+        // construct graph
+        ArrayList<Integer>[] graph = new ArrayList[N];
+        for (int i = 0; i < N; i++)
+            graph[i] = new ArrayList<>();
+
+        for (List<Integer> e : connections) {
+            int u = e.get(0), v = e.get(1);
+            graph[u].add(v);
+            graph[v].add(u);
+        }
+
+        // intialization
+        low = new int[N];
+        disc = new int[N];
+        visited = new boolean[N];
+        List<List<Integer>> ans = new ArrayList<>();
+        time = 0;
+        
+        for (int i = 0; i < N; i++) {
+            if (!visited[i]) {
+                dfs(graph, 0, -1, ans); // -1 -> since no parent for root node
+            }
+        }
+
+        return ans;
+    }
+    
+    private void dfs(ArrayList<Integer>[] graph, int src, int parent, List<List<Integer>> ans) {
+        disc[src] = low[src] = time++;
+        visited[src] = true;
+        
+        for (int nbr : graph[src]) {
+            if (!visited[nbr]) {
+                dfs(graph, nbr, src, ans);
+                
+                if (low[nbr] > disc[src]) {
+                    List<Integer> artEdge = new ArrayList<>(Arrays.asList(src, nbr));
+                    ans.add(artEdge);
+                }
+                
+                low[src] = Math.min(low[src], low[nbr]);
+            }
+            else if (nbr != parent) {
+                low[src] = Math.min(low[src], disc[nbr]);
+            }
+        }
     }
 
     /****************************************************************************************************/

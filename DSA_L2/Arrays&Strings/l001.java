@@ -1,38 +1,6 @@
 import java.util.*;
 
 public class l001 {
-    
-    // LC 925
-    // Two pointers logic => TC O(n+m) SC O(1)
-    public boolean isLongPressedName(String name, String typed) {
-        int i = 0, j = 0, n = name.length(), m = typed.length();
-        while (i < n && j < m) {
-            char ch1 = name.charAt(i), ch2 = typed.charAt(j);
-            if (ch1 == ch2) { // Property 1 => Both equal
-                i++;
-                j++;
-            }
-            else if (j-1 >= 0 && ch2 == typed.charAt(j-1)) // Property 2 => Prev equal (repetition)
-                j++;
-            else // wrong char
-                return false;
-        }
-        
-        while (j < m) { // i alone exhausted
-            char ch2 = typed.charAt(j);
-            if (ch2 == typed.charAt(j-1)) // Property 2 => Prev equal (repetition)
-                j++;
-            else // "abc", "abccd"
-                return false;
-        }
-        
-        if (i < n) // j alone exhausted
-            return false;
-        
-        return true;
-    }
-
-    /****************************************************************************************************/
 
     // LC 11
     // TC O(n) SC O(1)
@@ -83,129 +51,7 @@ public class l001 {
     }
 
     /****************************************************************************************************/
-
-    // LC 169
-    // Moore's Voting Algorithm => TC O(n) SC O(1)
-    public int majorityElement_01(int[] nums) {
-        int i = 1, n = nums.length;
-        
-        int val = nums[0];
-        int count = 1;
-        
-        while (i < n) {
-            if (nums[i] == val) {
-                count++;
-            }
-            else { // Distinct elem got
-                if (count > 0) {
-                    count--; // Pair distinct elems
-                }
-                else { // Create next valid candidate for majority elem
-                    val = nums[i];
-                    count = 1;
-                }
-            }
-            i++;
-        }
-        
-        return val; // Ques. says maj. always exist
-        
-        
-//         If maj. might not exist then below steps [Try this on Pep portal]
-        
-//         int freq = 0;
-//         for (int j = 0; j < n; j++) {
-//             if (nums[j] == val)
-//                 freq++;
-//         }
-        
-//         if (freq > n/2)
-//             return true; // Majority elem exist
-//         else 
-//             return false; // Majority elem doesn't exist
-    }
-
-    /****************************************************************************************************/
-
-    // LC 229
-    public List<Integer> majorityElement_02(int[] nums) {
-        int n = nums.length;
-        
-        int val1 = nums[0];
-        int count1 = 1;
-        
-        int val2 = -(int) 1e9; // assume -(int) 1e9 just for temp purpose, since count2 will handle initialization
-        int count2 = 0; // we need to yet initialize, so 0
-        
-        for (int i = 1; i < n; i++) {
-            if (nums[i] == val1)
-                count1++;
-            else if (nums[i] == val2)
-                count2++;
-            else { // distinct elem
-                if (count1 == 0) { // val1 initialization
-                    val1 = nums[i];
-                    count1 = 1;
-                }
-                else if (count2 == 0) { // val2 initialization
-                    val2 = nums[i];
-                    count2 = 1;
-                }
-                else { // pair up distinct elems
-                    count1--;
-                    count2--;
-                }
-            }
-        }
-        
-        // check for val1 & val2, freq > n/3
-        int freq1 = 0, freq2 = 0;
-        for (int i = 0; i < n; i++) {
-            if (nums[i] == val1)
-                freq1++;
-            else if (nums[i] == val2)
-                freq2++;
-        }
-
-        List<Integer> ans = new ArrayList<>();
-        if (freq1 > n/3)
-            ans.add(val1);
-        if (freq2 > n/3)
-            ans.add(val2);
-        
-        return ans;
-    }
-
-    /****************************************************************************************************/
-
-    // Majority Element General [Pepcoding Portal]
-    public static ArrayList<Integer> majorityElement_03(int[] arr, int k) {
-        int n = arr.length;
-        HashMap<Integer, Integer> map = new HashMap<>();
-        
-        // freq map for elems
-        for (int i = 0; i < n; i++) {
-            if (map.containsKey(arr[i])) {
-                map.put(arr[i], map.get(arr[i]) + 1);
-            }
-            else {
-                map.put(arr[i], 1);
-            }
-        }
-        
-        ArrayList<Integer> ans = new ArrayList<>();
-        for (int val : map.keySet()) {
-            int freq = map.get(val);
-            if (freq > n/k)
-                ans.add(val);
-        }
-        
-        Collections.sort(ans); // This is just for output matching
-        return ans;
-    }
-
-    /****************************************************************************************************/
-
+    
     // LC 556
     public int nextGreaterElement(int n) {
         if (n < 10) // Bcoz already in max possibility form
@@ -275,15 +121,169 @@ public class l001 {
 
     /****************************************************************************************************/
 
-    // LC 905
+    // LC 169
+    // Moore's Voting Algorithm => TC O(n) SC O(1)
+    public int majorityElement(int[] nums) {
+        int n = nums.length;
+        Integer majElem = null;
+        int count = 0, index = 0;
+        
+        while (index < n) {
+            if (count == 0) { // means a new set is to be processed
+                majElem = nums[index];
+                count = 1;
+            }
+            else if (nums[index] == majElem) {
+                count++;
+            }
+            else {
+                count--;
+            }
+            
+            index++;
+        }
+        
+        return majElem; // just bcoz ques says maj Elem will exist
+        
+        // if majElem doesn't exist
+        // int freq = 0;
+        // for (int i = 0; i < n; i++) {
+        //     if (nums[i] == majElem)
+        //         freq++;
+        // }
+
+        // return (freq > n/2) ? majElem : Integer.MIN_VALUE;
+        
+    }
+
+    /****************************************************************************************************/
+
+    // LC 769 (July 18)
+    public int maxChunksToSorted(int[] arr) {
+        int n = arr.length, max = -(int) 1e9;
+        
+        int chunks = 0;
+        for (int i = 0; i < n; i++) {
+            max = Math.max(max, arr[i]);
+            
+            if (max == i) { // all elems are from 0 to (n-1), so at max the value can only fluctuate upto it's index
+                chunks++;
+            }
+        }
+        
+        return chunks;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 768 (July 18)
+    public int maxChunksToSorted_(int[] arr) {
+        int n = arr.length;
+        int rightMin[] = new int[n]; // stores rightKaMin from i to n-1
+        
+        for (int i = n-1; i >= 0; i--) {
+            if (i == n-1) {
+                rightMin[i] = arr[n-1];
+                continue;
+            }
+            
+            rightMin[i] = Math.min(rightMin[i+1], arr[i]);
+        }
+        
+        int chunks = 0, leftMax = 0; // Basically maxSoFar
+        for (int i = 0; i < n-1; i++) {
+            leftMax = Math.max(leftMax, arr[i]);
+            
+            // leftSideKaMax < rightSideKaMin (means ek chunk mil gaya)
+            if (leftMax <= rightMin[i+1]) {
+                chunks++;
+            }
+        }
+        
+        return chunks+1;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 795 (July 18)
+    public int numSubarrayBoundedMax(int[] nums, int left, int right) {
+        int si = -1, ei = -1;
+        
+        int res = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] >= left && nums[i] <= right) { // in range
+                ei = i;
+            }
+            else if (nums[i] > right) {
+                si = ei = i;
+            }
+            else if (nums[i] < left) {
+                // do nothing
+            }
+            
+            res += (ei - si);
+        }
+        
+        return res;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 925 (July 18)
+    public boolean isLongPressedName(String name, String typed) {
+        String s1 = name, s2 = typed;
+        int i = 0, j = 0, n = s1.length(), m = s2.length();
+        
+        while (j < m) {
+            if (i < n && s1.charAt(i) == s2.charAt(j)) {
+                i++;
+                j++;
+            }
+            else if (j > 0 && s2.charAt(j) == s2.charAt(j-1)) { // currChar == prevChar
+                j++;
+            }
+            else {
+                return false; // aleex, alex
+            }
+        }
+        
+        return i == n; // alexa, aalex
+    }
+
+    /****************************************************************************************************/
+
+    // LC 747 (July 18)
+    public int dominantIndex(int[] nums) {
+        // intuition: if max is > than 2*secondMax, it is enough to confirm is twice than others for sure
+        int max = -1, secondMax = -1; // stores indexes of max
+        
+        for (int i = 0; i < nums.length; i++) {
+            if (max == -1 || nums[i] > nums[max]) {
+                secondMax = max;
+                max = i;
+            }
+            else if (secondMax == -1 || nums[i] > nums[secondMax]) {
+                secondMax = i;
+            }
+        }
+        
+        return nums[max] >= 2*nums[secondMax] ? max : -1;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 905 (July 20)
+    // Segregate regions (like 01, 012 regions) - (0 to j-1 -> even), (j to i-1 -> odd), (i to n -> unknown)
     public int[] sortArrayByParity(int[] nums) {
         int i = 0, j = 0;
-        while (j < nums.length) {
-            if (nums[j]%2 == 1) { // odd
-                j++; // increase odd segment
+        while (i < nums.length) {
+            if (nums[i] % 2 == 1) { // odd - just move
+                i++;
             }
-            else { // even
-                swap_00(nums, i, j);
+            else { // even - swap
+                int temp = nums[i];
+                nums[i] = nums[j];
+                nums[j] = temp;
                 i++;
                 j++;
             }
@@ -291,175 +291,102 @@ public class l001 {
         
         return nums;
     }
-    
-    public static void swap_00(int[] nums, int i, int j) {
-        int temp = nums[i];
-        nums[i] = nums[j];
-        nums[j] = temp;
-    }
 
     /****************************************************************************************************/
 
-    // LC 628
-    public int maximumProduct(int[] nums) {
-        int max1 = -(int) 1e9, max2 = -(int) 1e9, max3 = -(int) 1e9;
-        int min1 = (int) 1e9, min2 = (int) 1e9; // why only 2 min, bcoz mins will make again -ve on xply
-        
-        for (int val : nums) {
-            // For max
-            if (val > max1) {
-                max3 = max2;
-                max2 = max1;
-                max1 = val;
-            }
-            else if (val > max2) {
-                max3 = max2;
-                max2 = val;
-            }
-            else if (val > max3) {
-                max3 = val;
-            }
-            
-            // For min
-            if (val < min1) {
-                min2 = min1;
-                min1 = val;
-            }
-            else if (val < min2) {
-                min2 = val;
-            }
-        }
-        
-        int maxProduct = Math.max((max1 * max2 * max3), (min1 * min2 * max1));
-        return maxProduct;
-    }
-
-    /****************************************************************************************************/
-
-    // LC 769
-    public int maxChunksToSorted_(int[] arr) {
-        int n = arr.length;
-        
-        int chunks = 0;
-        int maxVal = -(int) 1e9;
-        for (int idx = 0; idx < n; idx++) {
-            maxVal = Math.max(maxVal, arr[idx]);
-            
-            if (idx == maxVal) // max impact range the maxVal can have is upto the idx, (0 <= val <= n-1)
-                chunks++;
-        }
-        
-        return chunks;
-    }
-
-    /****************************************************************************************************/
-
-    // LC 768
-    public int maxChunksToSorted(int[] arr) {
-        int n = arr.length;
-        
-        // No need for seperate leftMax, since we can make & manage leftMax along traversal itself
-        int[] rightMin = new int[n+1]; // why n+1, just to handle 
-        rightMin[n] = (int) 1e9; // for last edge case to incr final chunk
-        
-        // Prepare rightMin
-        for (int i = n-1; i >= 0; i--) {
-            rightMin[i] = Math.min(rightMin[i+1], arr[i]);
-        }
-        
-        int chunks = 0;
-        int leftMax = -(int) 1e9;
-        for (int idx = 0; idx < n; idx++) {
-            leftMax = Math.max(leftMax, arr[idx]);
-            
-            if (leftMax <= rightMin[idx+1])
-                chunks++;
-        }
-        
-        return chunks;
-    }
-
-    /****************************************************************************************************/
-
-    // LC 747
-    public int dominantIndex(int[] nums) {
-        if (nums.length == 1) // Edge case; one elem is obviously atleast twice than every other elem
-            return 0;
-        
-        int largestIdx = -1;
-        int max1 = -(int) 1e9, max2 = -(int) 1e9;
-        for (int i = 0; i < nums.length; i++) {
-            if (nums[i] > max1) {
-                max2 = max1;
-                max1 = nums[i];
-                largestIdx = i;
-            }
-            else if (nums[i] > max2) {
-                max2 = nums[i];
-            }
-        }
-        
-        return (max1 >= 2*max2) ? largestIdx : -1;
-    }
-
-    /****************************************************************************************************/
-
-    // LC 345
+    // LC 345 (July 20)
     public String reverseVowels(String s) {
-        char[] arr = s.toCharArray();
-        
-        int n = s.length();
-        int i = 0, j = n-1;
+        int i = 0, j = s.length()-1;
+        String check = "aeiouAEIOU";
+        StringBuilder sb = new StringBuilder(s);
+
         while (i < j) {
-            while (i < j && !isVowel(arr[i]))
+            // findd vowel chars to swap
+            while (i < j && check.indexOf(s.charAt(i)) == -1) {
                 i++;
-            while (i < j && !isVowel(arr[j]))
+            }
+            while (i < j && check.indexOf(s.charAt(j)) == -1) {
                 j--;
+            }
             
-            swap(arr, i, j);
+            // swap
+            char temp = sb.charAt(i);
+            sb.setCharAt(i, sb.charAt(j));
+            sb.setCharAt(j, temp);
+                
             i++;
             j--;
         }
         
-        return String.valueOf(arr);
-    }
-    
-    public static boolean isVowel(char ch) {
-        String vowels = "AEIOUaeiou";
-        return vowels.contains(ch + "");
-    }
-    
-    public static void swap(char[] arr, int i, int j) {
-        char temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
+        return sb.toString();
     }
 
     /****************************************************************************************************/
 
-    // LC 795
-    public int numSubarrayBoundedMax(int[] nums, int left, int right) {
-        int n = nums.length;
+    // NOTE:
+    // median -> middle elem present in an sorted arr
+    // avg -> middle value after summation of all elems of arr (totalSum/totalElems)
+    // avg val elem may or may not be present in arr
 
+    // LC 462
+    // Approach 1 - Using sort TC O(nlogn)
+    // Insightful mathematical concept
+    public int minMoves2(int[] nums) {
+        Arrays.sort(nums);
+        int n = nums.length;
+        
+        int moves = 0, median = nums[n/2];
+        
+        for (int i = 0; i < n; i++) 
+            moves += Math.abs(nums[i] - median);
+        
+        return moves;
+    }
+
+    // Approach 1 - Using Quick Select TC O(n) avg case, TC O(n^2) worst case
+    public int minMoves2_(int[] nums) {
+        int n = nums.length;
+        
+        // Quick select ot find median elem in an unsorted arr, TC O(N) avg case, O(N^2) worst case
+        int median = quickSelect(nums, 0, n-1, n/2);
+        
+        int moves = 0;
+        for (int i = 0; i < n; i++)
+            moves += Math.abs(nums[i] - median);
+        
+        return moves;
+    }
+    
+    private int quickSelect(int[] nums, int lo, int hi, int medianIdx) {
+        int pivotIdx = partition(nums, lo, hi);
+        if (pivotIdx < medianIdx)
+            return quickSelect(nums, pivotIdx+1, hi, medianIdx);
+        else if (pivotIdx > medianIdx)
+            return quickSelect(nums, lo, pivotIdx-1, medianIdx);
+        else 
+            return nums[pivotIdx]; // found medianElem
+    }
+    
+    // segregate or partition regions (like sort 01, 012 regions problems)
+    private int partition(int[] nums, int lo, int hi) {
+        int pivotElem = nums[hi];
         int i = 0, j = 0;
-        int prevCount = 0; // indicates last subarrs count having max in-range
-        int count = 0; // indicates total no. of subarrs having max in-range
-        while (i < n) {
-            if (nums[i] >= left && nums[i] <= right) { // max in-range
-                prevCount = i-j+1;
-                count += i-j+1;
+        while (i <= hi) {
+            if (nums[i] > pivotElem) {
+                i++;
             }
-            else if (nums[i] < left) { // less than range,but has no impact on max of subarr, so consider
-                count += prevCount; //combine nums[i] in prev subarrs in-range forming new unique subarrs
+            else {
+                // swap
+                int temp = nums[i];
+                nums[i] = nums[j];
+                nums[j] = temp;
+                i++;
+                j++;
             }
-            else { // greater than range, impacts max of any subarr formed which will include nums[i]
-                prevCount = 0; // Break point, so reset
-                j = i+1; // move j, since can't subarr from j, since max has been impacted
-            }
-            i++;
         }
         
-        return count;
+        int pivotIdx = j-1;
+        return pivotIdx;
     }
 
     /****************************************************************************************************/

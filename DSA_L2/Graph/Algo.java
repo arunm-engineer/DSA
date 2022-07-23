@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MST_Kruskal {
+public class Algo {
 
     public static class Edge {
         int v = 0;
@@ -112,6 +112,58 @@ public class MST_Kruskal {
      * 
      * We've different TC stated according interms of V and interms E
      *  */ 
+
+    /****************************************************************************************************/
+
+    // Articulation Point and Bridges(Edges)
+    // disc - discovery time of node, low - node with lowest discovery time accessible
+    private int[] low, disc;
+    private boolean[] articulation, visited;
+    private int time, rootCalls; // rootCalls - indicates num of dfs calls made from root node for non-visited nodes
+    // parent - can also be maintained in arr instead passing as a variable in dfs call
+
+    private void dfs(ArrayList<Edge>[] graph, int src, int parent) {
+        disc[src] = low[src] = time++;
+        visited[src] = true;
+
+        for (Edge e : graph[src]) {
+            int nbr = e.v;
+            if (!visited[nbr]) {
+                if (parent == -1)
+                    rootCalls++;
+
+                dfs(graph, nbr, src);
+
+                // Articulation Points
+                if (low[nbr] >= disc[src]) // has no back edge to more lowest disc node, so will break to comp
+                    articulation[src] = true;
+                // Articulation Edges
+                if (low[nbr] > disc[src]) // == case means has atleast one back edge to directly to itself in the comp, so can't break into multiple comps
+                    System.out.println("Articulation edge : " + src + " -> " + nbr);
+
+                low[src] = Math.min(low[src], low[nbr]);
+            }
+            else if (nbr != parent) { // visited node & not parent node
+                low[src] = Math.min(low[src], disc[nbr]);
+            }
+        }
+    }
+
+    // 1. Why disc[nbr] for visited node case - we can't take low[nbr] since we can't directly reach or have edge to low[nbr] (lowest accessible of nbr, but accessible only upto that nbr node itself)
+    // 2. why low[nbr] on backtrack - means that node can also reached by low[nbr] node (another new path)
+
+    public void ArticulationPointAndBridges(ArrayList<Edge>[] graph) {
+        int N = graph.length;
+        low = disc = new int[N];
+        visited = articulation = new boolean[N];
+        time = 0;
+
+        for (int i = 0; i < N; i++) {
+            if (!visited[i]) {
+                dfs(graph, i, -1); // -1 indicates no parent - root node
+            }
+        }
+    }
 
     /****************************************************************************************************/
 
