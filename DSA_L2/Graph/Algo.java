@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.PriorityQueue;
 
 public class Algo {
 
@@ -35,7 +36,7 @@ public class Algo {
     /****************************************************************************************************/
 
     // Minimum Spanning Tree (MST) => Summation of all edges wt. which is minimum
-    // Kruskal's Algo => DSU + Sort edges on basis of wt. in increasing order
+    // Kruskal's Algorithm => DSU + Sort edges on basis of wt. in increasing order
 
     int[] parent, size;
 
@@ -115,7 +116,7 @@ public class Algo {
 
     /****************************************************************************************************/
 
-    // Articulation Point and Bridges(Edges)
+    // Articulation Point and Bridges(Edges) TC O(V+E)
     // disc - discovery time of node, low - node with lowest discovery time accessible
     private int[] low, disc;
     private boolean[] articulation, visited;
@@ -161,6 +162,64 @@ public class Algo {
         for (int i = 0; i < N; i++) {
             if (!visited[i]) {
                 dfs(graph, i, -1); // -1 indicates no parent - root node
+            }
+        }
+    }
+
+    /****************************************************************************************************/
+
+    // Djikstra's Algorithm
+    // Algo used to get Min Cost Path from given src vtx to any other vtx(dest)
+    // Also this algo will construct a Acyclic Graph which will be a ST (but not necessarily a MST)
+    // Same BFS based algo, just PQ instead of Queue as in BFS
+    private class Pair {
+        int vtx;
+        int par; // parent
+        int wt;
+        int wsf; // weight so far
+
+        public Pair() {}
+
+        public Pair(int vtx, int par, int wt, int wsf) {
+            this.vtx = vtx;
+            this.par = par;
+            this.wt = wt;
+            this.wsf = wsf;
+        }
+    }
+
+    // Simple code-wise easy Djikstra
+    public void djikstra_01(ArrayList<Edge>[] graph, int src) {
+        int N = graph.length;
+        ArrayList<Edge>[] newGraph = new ArrayList[N]; // Acyclic min cost path graph constructed by Djikstra Algo from given src vtx to any vtx(dest)
+        for (int i = 0; i < N; i++)
+            graph[i] = new ArrayList<>();
+
+        boolean[] visited = new boolean[N];
+        int[] dis = new int[N]; //distance arr -> stores min cost i.e. min dist to reach the vtx from a given src vtx
+        int[] par = new int[N]; // parent arr -> stores parent of vtx, parent vtx - vtx which is part of the minCost path
+
+        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> {
+            return a.wsf - b.wsf; // min heap based on wsf
+        });
+
+        pq.add(new Pair(src, -1, 0, 0));
+        while (!pq.isEmpty()) {
+            Pair p = pq.remove();
+
+            if (visited[p.vtx])
+                continue;
+
+            if (p.par != -1) // to construct acyclic minCost path graph
+                addEdge(newGraph, p.par, p.vtx, p.wt);
+
+            visited[p.vtx] = true;
+            par[p.vtx] = p.par;
+            dis[p.vtx] = p.wsf;
+            for (Edge e : graph[p.vtx]) {
+                if (!visited[e.v]) {
+                    pq.add(new Pair(e.v, p.vtx, e.w, p.wsf + e.w));
+                }
             }
         }
     }

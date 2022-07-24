@@ -113,7 +113,7 @@ public class l001 {
 
     public static void reverse(char[] num, int left, int right) {
         while (left < right) {
-            swap(num, left, right);
+            swap_00(num, left, right);
             left++;
             right--;
         }
@@ -328,8 +328,8 @@ public class l001 {
     // avg -> middle value after summation of all elems of arr (totalSum/totalElems)
     // avg val elem may or may not be present in arr
 
-    // LC 462
-    // Approach 1 - Using sort TC O(nlogn)
+    // LC 462 (July 20)
+    // Approach 1 - Using sort TC O(NlogN)
     // Insightful mathematical concept
     public int minMoves2(int[] nums) {
         Arrays.sort(nums);
@@ -343,7 +343,7 @@ public class l001 {
         return moves;
     }
 
-    // Approach 1 - Using Quick Select TC O(n) avg case, TC O(n^2) worst case
+    // Approach 2 - Using Quick Select TC O(N) avg case, TC O(N^2) worst case
     public int minMoves2_(int[] nums) {
         int n = nums.length;
         
@@ -387,6 +387,101 @@ public class l001 {
         
         int pivotIdx = j-1;
         return pivotIdx;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 238 (July 20)
+    // TC O(N)
+    public int[] productExceptSelf(int[] nums) {
+        int n = nums.length;
+        int[] ans = new int[n];
+            
+        int[] suffixProduct = new int[n+1]; // stores product from right side
+        for (int i = n; i >= 0; i--) {
+            if (i == n) {
+                suffixProduct[i] = 1;
+                continue;
+            }
+            
+            suffixProduct[i] = nums[i] * suffixProduct[i+1];
+        }
+        
+        int prefixProduct = 1; // stores product from left side
+        for (int i = 0; i < n; i++) {
+            ans[i] = prefixProduct * suffixProduct[i+1];
+            prefixProduct *= nums[i];
+        }
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 670 (July 20)
+    // TC O(N)
+    public int maximumSwap(int num) {
+        char[] nums = (num + "").toCharArray();
+        int n = nums.length;
+        
+        int[] rightMax = new int[n]; // stores indexes of maxValue from right side
+        for (int i = n-1; i >= 0; i--) {
+            int digit1 = nums[i] - '0';
+            
+            if (i == n-1) {
+                rightMax[i] = i;
+                continue;
+            }
+
+            int j = rightMax[i+1], digit2 = nums[j] - '0';
+            
+            rightMax[i] = (digit1 > digit2) ? i : j;
+        }
+        
+        for (int i = 0; i < n-1; i++) {
+            int digit1 = nums[i] - '0';
+            int j = rightMax[i+1], digit2 = nums[j] - '0';
+            
+            if (digit1 < digit2) {
+                // swap
+                char temp = nums[i];
+                nums[i] = nums[j];
+                nums[j] = temp;
+                break;
+            }
+        }
+        
+        return Integer.parseInt(String.valueOf(nums));
+    }
+
+    /****************************************************************************************************/
+
+    // LC 849 (July 20) Ad-hoc problem
+    // Testcase - 00010000010000100
+    // edge cases for first & last occurence of 1, we need to calculate gap by trick
+    public int maxDistToClosest(int[] seats) {
+        int n = seats.length;
+        
+        int j = -1; // prevIdx for 1
+        int ans = 0;
+        for (int i = 0; i < n; i++) {
+            if (seats[i] == 1) {
+                int val = 0;
+                
+                if (j == -1)
+                    val = i; // first occurence 1, gap=idx
+                else 
+                    val = (i-j)/2; // why (gap/2)? - since only best spot to maximize distance
+                
+                ans = Math.max(ans, val);
+                j = i;
+            }
+        }
+        
+        // gap for last occurence of 1
+        ans = Math.max(ans, (n-1) - j); // assume last spot as 1 to calc gap
+        
+        return ans;
     }
 
     /****************************************************************************************************/
