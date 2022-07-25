@@ -180,15 +180,26 @@ public class Algo {
 
         public Pair() {}
 
-        public Pair(int vtx, int par, int wt, int wsf) {
+        public Pair(int vtx, int par, int wt, int wsf) { // for Djikstra_01
             this.vtx = vtx;
             this.par = par;
             this.wt = wt;
             this.wsf = wsf;
         }
+
+        public Pair(int vtx, int wsf) { // for Djikstra_02
+            this.vtx = vtx;
+            this.wsf = wsf;
+        }
+
+        public Pair(int vtx, int par, int wt) { // for Djikstra_01
+            this.vtx = vtx;
+            this.par = par;
+            this.wt = wt;
+        }
     }
 
-    // Simple code-wise easy Djikstra
+    // Approach 1 - Simple code-wise easy Djikstra
     public void djikstra_01(ArrayList<Edge>[] graph, int src) {
         int N = graph.length;
         ArrayList<Edge>[] newGraph = new ArrayList[N]; // Acyclic min cost path graph constructed by Djikstra Algo from given src vtx to any vtx(dest)
@@ -199,8 +210,12 @@ public class Algo {
         int[] dis = new int[N]; //distance arr -> stores min cost i.e. min dist to reach the vtx from a given src vtx
         int[] par = new int[N]; // parent arr -> stores parent of vtx, parent vtx - vtx which is part of the minCost path
 
+        // Default values
+        Arrays.fill(dis, (int) 1e9);
+        Arrays.fill(par, -1);
+
         PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> {
-            return a.wsf - b.wsf; // min heap based on wsf
+            return a.wsf - b.wsf; // min heap based on wsf (weight so far)
         });
 
         pq.add(new Pair(src, -1, 0, 0));
@@ -216,9 +231,90 @@ public class Algo {
             visited[p.vtx] = true;
             par[p.vtx] = p.par;
             dis[p.vtx] = p.wsf;
+
             for (Edge e : graph[p.vtx]) {
                 if (!visited[e.v]) {
                     pq.add(new Pair(e.v, p.vtx, e.w, p.wsf + e.w));
+                }
+            }
+        }
+    }
+
+    // Approach 2 - Better version of Djikstra
+    // Without using visited - if (newWSF < oldWSF) then update since it's a minCost
+    public void djikstra_02(ArrayList<Edge>[] graph, int src) {
+        int N = graph.length;
+        int[] dis = new int[N]; //distance arr -> stores min cost i.e. min dist to reach the vtx from a given src vtx
+        int[] par = new int[N]; // parent arr -> stores parent of vtx, parent vtx - vtx which is part of the minCost path
+
+        // Default values
+        Arrays.fill(dis, (int) 1e9);
+        Arrays.fill(par, -1);
+
+        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> {
+            return a.wsf - b.wsf; // min heap based on wsf
+        });
+
+        pq.add(new Pair(src, 0));
+        while (!pq.isEmpty()) {
+            Pair p = pq.remove();
+
+            if (p.wsf >= dis[p.vtx]) // already we got a minCost, so dont process it further, also this forms a cycle over here
+                continue;
+
+            for (Edge e : graph[p.vtx]) {
+                if (p.wsf + e.w < dis[e.v]) {
+                    dis[e.v] = p.wsf + e.w;
+                    par[e.v] = p.vtx;
+                    pq.add(new Pair(e.v, p.wsf + e.w));
+                }
+            }
+        }
+    }
+
+    /****************************************************************************************************/
+
+    // Prims Algorithm
+    // To find MST (Same BFS logic, PQ instead of Queue)
+    // MST - MinCost of the summation of all the edges wt, Also constructs Acyclic graph
+    // NOTE: Prims and Djikstra might give same answer in some cases, but not always, both are complete different logic
+
+    // Approach 1 - Simple code-wise easy Djikstra
+    public void Prims_01(ArrayList<Edge>[] graph, int src) {
+        int N = graph.length;
+        ArrayList<Edge>[] newGraph = new ArrayList[N]; // Acyclic min cost path graph constructed by Djikstra Algo from given src vtx to any vtx(dest)
+        for (int i = 0; i < N; i++)
+            graph[i] = new ArrayList<>();
+
+        boolean[] visited = new boolean[N];
+        int[] dis = new int[N]; //distance arr -> stores min cost i.e. min dist to reach the vtx from a given src vtx
+        int[] par = new int[N]; // parent arr -> stores parent of vtx, parent vtx - vtx which is part of the minCost path
+
+        // Default values
+        Arrays.fill(dis, (int) 1e9);
+        Arrays.fill(par, -1);
+
+        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> {
+            return a.wt - b.wt; // min heap based on wt
+        });
+
+        pq.add(new Pair(src, -1, 0));
+        while (!pq.isEmpty()) {
+            Pair p = pq.remove();
+
+            if (visited[p.vtx])
+                continue;
+
+            if (p.par != -1) // to construct acyclic minCost path graph
+                addEdge(newGraph, p.par, p.vtx, p.wt);
+
+            visited[p.vtx] = true;
+            par[p.vtx] = p.par;
+            dis[p.vtx] = p.wt;
+
+            for (Edge e : graph[p.vtx]) {
+                if (!visited[e.v]) {
+                    pq.add(new Pair(e.v, p.vtx, e.w));
                 }
             }
         }
