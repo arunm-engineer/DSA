@@ -268,21 +268,86 @@ public class dsuQuestions {
 
     /****************************************************************************************************/
 
+    // LC 685
+    // case 1 : 2 indegrees alone (2 parents for a node)
+    // case 2 : only a cycle exists (no 2 indegrees)
+    // case 3 : both 2 indegrees and a cycle exists
+    int[] parent_06;
+    public int[] findRedundantDirectedConnection(int[][] edges) {
+        int N = edges.length;
+        
+        // first find case 1 : 2 indegrees
+        int[] indegrees = new int[N+1];
+        Arrays.fill(indegrees, -1);
+        int edge1 = -1, edge2 = -1; // stores index of edge from edges arr
+        for (int i = 0; i < N; i++) {
+            int u = edges[i][0], v = edges[i][1];
+            if (indegrees[v] == -1) { 
+                indegrees[v] = i;
+            }
+            else { // 2 indegrees found
+                edge1 = indegrees[v];
+                edge2 = i;
+                break;
+            }
+        }
+        
+        
+        // Still we need to find if at all cycle exists, then our answeer changes
+        parent_06 = new int[N+1];
+        for (int i = 0; i < N; i++) parent_06[i] = i;
+        
+        for (int i = 0; i < N; i++) {
+            if (i == edge2) // ignoring edge2 since it came later, which might have caused indegrees prblm
+                continue;
+            
+            int u = edges[i][0], v = edges[i][1];
+            boolean isCycle = union(u, v);
+            if (isCycle) {
+                if (edge1 == -1) { // case 2, means no 2 indegree, so no edge ignored, so only a cycle
+                    return edges[i];
+                } 
+                else { // case 3, still found cycle, means ignored worng edge, so other edge to be removed
+                    return edges[edge1];
+                }
+            }
+        }
+        
+        return edges[edge2]; // case 1, also case 3 since we ignored correct edge in DSU so no cycle
+    }
+    
+    private boolean union(int u, int v) {
+        int p1 = findParent_06(u), p2 = findParent_06(v);
+        if (p1 != p2) {
+            parent_06[p2] = p1;
+            return false; // no cycle
+        }
+        else { // cycle
+            return true;
+        }
+    }
+    
+    private int findParent_06(int u) {
+        return parent_06[u] == u ? u : (parent_06[u] = findParent_06(parent_06[u]));
+    }
+
+    /****************************************************************************************************/
+
     // LC 959
     // Using DSU
-    private int[] parent;
+    private int[] parent_07;
     public int regionsBySlashes(String[] grid) {
         int n = grid.length;
         int m = n + 1;
         
-        parent = new int[m * m]; // n & m same as per constraints given
+        parent_07 = new int[m * m]; // n & m same as per constraints given
         
         for (int i = 0; i < m * m; i++) {
-            parent[i] = i;
+            parent_07[i] = i;
             
             int r = i / m, c = i % m;
             if (r == 0 || r == m-1 || c == 0 || c == m-1)
-                parent[i] = 0; // connect by making a global parent for the boundary regions
+                parent_07[i] = 0; // connect by making a global parent for the boundary regions
         }
         
         int regions = 1; // initially after joining all boundaries we will have 1 region by default
@@ -296,21 +361,21 @@ public class dsuQuestions {
                     // For (x, y) -> (x, y+1) (x+1, y)
                     int u = i * m + j + 1;
                     int v = (i+1) * m + j;
-                    p1 = findParent(u);
-                    p2 = findParent(v);
+                    p1 = findParent_07(u);
+                    p2 = findParent_07(v);
                 }
                 else if (ch == '\\') { // this format will come as one single char bcoz of escape sequence
                     // For (x, y) -> (x, y) (x+1, y+1)
                     int u = i * m + j;
                     int v = (i + 1) * m + j + 1;
-                    p1 = findParent(u);
-                    p2 = findParent(v);
+                    p1 = findParent_07(u);
+                    p2 = findParent_07(v);
                 }
                 else // means empty space -> ' '
                     continue;
                 
                 if (p1 != p2) 
-                    parent[p1]= p2;
+                    parent_07[p1]= p2;
                 else // a cycle indicates two boundaries have touched which will partition a new region
                     regions++;
             }            
@@ -319,8 +384,8 @@ public class dsuQuestions {
         return regions;
     }
     
-    private int findParent(int u) {
-        return parent[u] == u ? u : (parent[u] = findParent(parent[u]));
+    private int findParent_07(int u) {
+        return parent_07[u] == u ? u : (parent_07[u] = findParent_07(parent_07[u]));
     }
 
     /****************************************************************************************************/
