@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
 
 public class AlgoQuestions {
     
@@ -151,6 +152,121 @@ public class AlgoQuestions {
                 low[src] = Math.min(low[src], disc[nbr]);
             }
         }
+    }
+
+    /****************************************************************************************************/
+
+    // LC 743
+    // Djikstra Approach 1
+    public int networkDelayTime(int[][] times, int n, int k) {
+        ArrayList<Edge>[] graph = constructGraph(times, n); // Instead of Edge class we can use int[] array to represent edge (OA test - int[], Interview - Edge class)
+        
+        // Djikstra's Algo
+        boolean[] visited = new boolean[n+1];
+        int[] dis = new int[n+1];
+        Arrays.fill(dis, (int) 1e9);
+        
+        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> { // Instead of Pair class we can use int[] array to represent edge (OA test - int[], Interview - Pair class)
+            return a.wsf - b.wsf;
+        });
+        
+        pq.add(new Pair(k, 0));
+        while (!pq.isEmpty()) {
+            Pair p = pq.remove();
+            
+            if (visited[p.vtx])
+                continue;
+            
+            visited[p.vtx] = true;
+            dis[p.vtx] = p.wsf;
+            
+            for (Edge e : graph[p.vtx]) {
+                if (!visited[e.v]) {
+                    pq.add(new Pair(e.v, p.wsf + e.w));
+                }
+            }
+        }
+        
+        int minTime = -(int) 1e9;
+        for (int i = 1; i < dis.length; i++) // since nodes vtx starts from 1
+            minTime = Math.max(dis[i], minTime);
+        
+        return minTime == (int) 1e9 ? -1 : minTime;
+    }
+
+    // Djikstra Approach 2
+    public int networkDelayTime_(int[][] times, int n, int k) {
+        ArrayList<Edge>[] graph = constructGraph(times, n);
+        
+        // Djikstra's Algo
+        int[] dis = new int[n+1];
+        Arrays.fill(dis, (int) 1e9);
+        
+        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> {
+            return a.wsf - b.wsf;
+        });
+        
+        pq.add(new Pair(k, 0));
+        dis[k] = 0;
+        while (!pq.isEmpty()) {
+            Pair p = pq.remove();
+            
+            if (p.wsf > dis[p.vtx])
+                continue;
+            
+            for (Edge e : graph[p.vtx]) {
+                if (p.wsf + e.w < dis[e.v]) {
+                    dis[e.v] = p.wsf + e.w;
+                    pq.add(new Pair(e.v, p.wsf + e.w));
+                }
+            }
+        }
+        
+        int minTime = -(int) 1e9;
+        for (int i = 1; i < dis.length; i++) // since nodes vtx starts from 1
+            minTime = Math.max(dis[i], minTime);
+        
+        return minTime == (int) 1e9 ? -1 : minTime;
+    }
+    
+    private class Pair {
+        int vtx;
+        int wsf;
+        
+        public Pair() {}
+        
+        public Pair(int vtx, int wsf) {
+            this.vtx = vtx;
+            this.wsf = wsf;
+        }
+    }
+    
+    private class Edge {
+        int v;
+        int w;
+        
+        public Edge() {}
+        
+        public Edge(int v, int w) {
+            this.v = v;
+            this.w = w;
+        }
+    }
+    
+    private ArrayList<Edge>[] constructGraph(int[][] times, int n) {
+        ArrayList<Edge>[] graph = new ArrayList[n+1];
+        
+        for (int i = 0; i < graph.length; i++)
+            graph[i] = new ArrayList<Edge>();
+        
+        for (int[] e : times) 
+            addEdge(graph, e[0], e[1], e[2]);
+        
+        return graph;
+    }
+    
+    private void addEdge(ArrayList<Edge>[] graph, int u, int v, int w) {
+        graph[u].add(new Edge(v, w));
     }
 
     /****************************************************************************************************/

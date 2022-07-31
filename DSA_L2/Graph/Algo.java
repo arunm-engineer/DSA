@@ -248,10 +248,10 @@ public class Algo {
         });
 
         pq.add(new Pair(src, 0));
+        dis[src] = 0;
         while (!pq.isEmpty()) {
             Pair p = pq.remove();
-
-            if (p.wsf >= dis[p.vtx])
+            if (p.wsf > dis[p.vtx]) // >= will not work since == will see same value and continue, which will not add current node's nbr edges
                 continue;
 
             for (Edge e : graph[p.vtx]) {
@@ -336,6 +336,7 @@ public class Algo {
         });
 
         pq.add(new PrimsPair(src, -1, 0));
+        dis[src] = 0;
         while (!pq.isEmpty()) {
             PrimsPair p = pq.remove();
 
@@ -348,7 +349,7 @@ public class Algo {
             visited[p.vtx] = true;
 
             for (Edge e : graph[p.vtx]) {
-                if (e.w < dis[e.v]) { // this will prevent adding useless high weighted edges wt in PQ
+                if (!visited[e.v] && e.w < dis[e.v]) { // this will prevent adding useless high weighted edges wt in PQ
                     dis[e.v] = e.w;
                     pq.add(new PrimsPair(e.v, p.vtx, e.w));
                 }
