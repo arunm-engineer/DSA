@@ -271,4 +271,142 @@ public class AlgoQuestions {
 
     /****************************************************************************************************/
 
+    // LC 787
+    // Aprroach 1 - Djikstra like, not exactly (But based on 2 factors - wsf & k stops)
+    // Correct approach but we'll get TLE (Just for relating with Djikstra solved this, conceptual based)
+    // TC O(ElogV)
+    public int findCheapestPrice_00(int n, int[][] flights, int src, int dst, int k) {
+        ArrayList<Edge>[] graph = constructGraph(flights, n); // can use int[] instead of Edge in OA
+        
+        // can't use dis arr concept since we've 2 factors here wsf and k stops
+        // so wsf can be big also even if stops are within k
+        // Note: for k=1 -> edges=2, k=2 -> edges=3 (i.e. edges = k+1, k resembles nodes which takes at max k+1 edges to reach from src to dest with k stops in-between)
+
+        int allowedEdges = k+1;
+        PriorityQueue<Pair> pq = new PriorityQueue<>((a, b) -> {
+            return a.wsf - b.wsf;
+        });
+
+        pq.add(new Pair(src, 0, 0));
+        while (!pq.isEmpty()) {
+            Pair p = pq.remove();
+            
+            if (p.edges > allowedEdges) 
+                continue;
+            
+            if (p.vtx == dst) // at this point edges are within allowedEdges & we reached dest with min. wsf
+                return p.wsf;
+            
+            for (Edge e : graph[p.vtx]) {
+                pq.add(new Pair(e.v, p.wsf + e.w, p.edges + 1));
+            }
+        }
+        
+        return -1; // means we cant reach dest within k stops, if at all ans existed it would be caught above
+    }
+    
+    private class Pair {
+        int vtx;
+        int wsf;
+        int edges;
+        
+        public Pair() {}
+        
+        public Pair(int vtx, int wsf, int edges) {
+            this.vtx = vtx;
+            this.wsf = wsf;
+            this.edges = edges;
+        }
+    }
+    
+    private class Edge {
+        int v;
+        int w;
+        
+        public Edge() {}
+        
+        public Edge(int v, int w) {
+            this.v = v;
+            this.w = w;
+        }
+    }
+    
+    private ArrayList<Edge>[] constructGraph(int[][] edges, int N) {
+        ArrayList<Edge>[] graph = new ArrayList[N];
+        for (int i = 0; i < N; i++)
+            graph[i] = new ArrayList<Edge>();
+        
+        for (int[] e : edges) {
+            int u = e[0], v = e[1], w = e[2];
+            addEdge(graph, u, v, w);
+        }
+        
+        return graph;
+    }
+    
+    private void addEdge(ArrayList<Edge>[] graph, int u, int v, int w) {
+        graph[u].add(new Edge(v, w));
+    }
+
+    // Bellman Ford Algo 
+    // (Simple version) Accepted
+    // Since only +ve edges, no negative cycle exists
+    public int findCheapestPrice_01(int n, int[][] flights, int src, int dst, int k) {
+        int[] prev = new int[n]; // k+1 size is enough 
+        Arrays.fill(prev, (int) 1e9);
+        prev[src] = 0;
+        
+        int totalEdges = k+1; 
+        for (int i = 1; i <= totalEdges; i++) { // ith idx says atmost using i edges, min. wt. to reach vtxs
+            int[] curr = new int[n];
+            for (int j = 0; j < n; j++) 
+                curr[j] = prev[j];
+
+            for (int[] e : flights) {
+                int u = e[0], v = e[1], w = e[2];
+                if (prev[u] != (int) 1e9 && prev[u] + w < curr[v]) 
+                    curr[v] = prev[u] + w;
+            }
+
+            prev = curr;
+        }
+        
+        return prev[dst] != (int) 1e9 ? prev[dst] : -1;
+    }
+
+    // Bellman Ford Algo 
+    // (Time and space optimized version) Accepted
+    // Since only +ve edges, no negative cycle exists
+    public int findCheapestPrice_02(int n, int[][] flights, int src, int dst, int k) {
+        // k+1 size is enough
+        int[] prev = new int[n]; // u 
+        int[] curr = new int[n]; // v
+        Arrays.fill(prev, (int) 1e9);
+        Arrays.fill(curr, (int) 1e9);
+        prev[src] = curr[src] = 0;
+
+        int totalEdges = k+1; 
+        for (int i = 1; i <= totalEdges; i++) { // ith idx says atmost using i edges, min. wt. to reach vtxs
+            boolean anyUpdate = false;
+
+            for (int[] e : flights) {
+                int u = e[0], v = e[1], w = e[2];
+                if (prev[u] != (int) 1e9 && prev[u] + w < curr[v]) {
+                    curr[v] = prev[u] + w;
+                    anyUpdate = true;
+                }
+            }
+
+            if (!anyUpdate) // means no update further as well
+                break;
+
+            for (int j = 0; j < n; j++) 
+                prev[j] = curr[j];
+        }
+        
+        return prev[dst] != (int) 1e9 ? prev[dst] : -1;
+    }
+
+    /****************************************************************************************************/
+
 }

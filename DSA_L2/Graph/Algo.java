@@ -359,4 +359,110 @@ public class Algo {
 
     /****************************************************************************************************/
 
+    // Bellman Ford Algorithm (Min cost path event with -ve edges)
+    // If -ve cycle exists, detects and says -ve cycle exists; if no -ve cycle then returns correct answer
+    // Works without constructing graph, only edges is enough
+    // Each of the edges idx, i.e. ith index says => Atmost using i no. of edges, min wt. to reach the vtx is...
+    // TC V(V+E) => (V.V + V.E) => O(V.E) Better complexity than Djikstra
+    public static void bellmanFord(int[][] edges, int N, int src) {
+        // N = no. of vertices, we require Vth edge to detect -ve cycle
+        int[] prev = new int[N]; // u
+        Arrays.fill(prev, (int) 1e9);
+        prev[src] = 0; // relaxation of src vtx
+        
+        boolean negativeCycle = false;
+
+        for (int i = 1; i <= N; i++) { // runs till Vth edge, since V-1 edges cant form a cycle, 1 extra edge, Vth forms the possibility for cycle to exist
+            int[] curr = new int[N]; // v
+            for (int j = 0; j < N; j++) 
+                curr[j] = prev[j];
+
+            for (int[] e : edges) {
+                int u = e[0], v = e[1], w = e[2];
+                if (prev[u] != (int) 1e9 && prev[u] + w < curr[v]) { // if infinity ignore, else less value "updation"
+                    curr[v] = prev[u] + w;
+
+                    if (i == N) // Vth edge, since updates so -ve cycle exists
+                        negativeCycle = true;
+                }
+            }
+
+            prev = curr;
+        }
+
+        System.out.println("Negative cycle : " + negativeCycle);
+    }
+
+    // Slight time optimized
+    // If no update in a complete ith edge, then "no" update will occur for n-i edges as well, so return ans there itself
+    public static void bellmanFord_TimeOptimized(int[][] edges, int N, int src) {
+        int[] prev = new int[N]; // u
+        Arrays.fill(prev, (int) 1e9);
+        prev[src] = 0;
+        
+        boolean negativeCycle = false;
+
+        for (int i = 1; i <= N; i++) {
+            int[] curr = new int[N]; // v
+            for (int j = 0; j < N; j++) 
+                curr[j] = prev[j];
+
+            boolean anyUpdate = false;
+            for (int[] e : edges) {
+                int u = e[0], v = e[1], w = e[2];
+                if (prev[u] != (int) 1e9 && prev[u] + w < curr[v]) {
+                    curr[v] = prev[u] + w;
+                    anyUpdate = true;
+
+                    if (i == N)
+                        negativeCycle = true;
+                }
+            }
+
+            if (!anyUpdate) // means no update further as well
+                break;
+
+            prev = curr;
+        }
+
+        System.out.println("Negative cycle : " + negativeCycle);
+    }
+
+    // Slight space optimized we maintain we use same prev arr to maintain copied state, so we don't create "new" arr all the time for each ith edge
+    public static void bellmanFord_SpaceOptimized(int[][] edges, int N, int src) {
+        int[] prev = new int[N]; // u
+        int[] curr = new int[N]; // v
+        Arrays.fill(prev, (int) 1e9);
+        Arrays.fill(curr, (int) 1e9);
+
+        prev[src] = curr[src] = 0;
+        
+        boolean negativeCycle = false;
+
+        for (int i = 1; i <= N; i++) {
+            boolean anyUpdate = false;
+
+            for (int[] e : edges) {
+                int u = e[0], v = e[1], w = e[2];
+                if (prev[u] != (int) 1e9 && prev[u] + w < curr[v]) {
+                    curr[v] = prev[u] + w;
+                    anyUpdate = true;
+
+                    if (i == N)
+                        negativeCycle = true;
+                }
+            }
+
+            if (!anyUpdate) // means no update further as well
+                break;
+
+            for (int j = 0; j < N; j++) 
+                prev[j] = curr[j];
+        }
+
+        System.out.println("Negative cycle : " + negativeCycle);
+    }
+
+    /****************************************************************************************************/
+
 }
