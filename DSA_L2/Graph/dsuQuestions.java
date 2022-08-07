@@ -390,4 +390,64 @@ public class dsuQuestions {
 
     /****************************************************************************************************/
 
+    // LC 924
+    private int[] parent;
+    private int[] size; // represents population count of country
+    // initial arr contains infected persons
+    public int minMalwareSpread(int[][] graph, int[] initial) {
+        int N = graph.length;
+        parent = new int[N];
+        size = new int[N];
+        
+        for (int i = 0; i < N; i++) {
+            parent[i] = i;
+            size[i] = 1;
+        }
+        
+        for (int i = 0; i < N; i++) {
+            int p1 = findParent(i);
+            for (int j = 0; j < N; j++) {
+                if (i != j) { // self pointing, although DSU will handle this case by default
+                    if (graph[i][j] == 1) {
+                        int p2 = findParent(j);
+                        if (p1 != p2) {
+                            parent[p2] = p1;
+                            size[p1] += size[p2];
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Now find & store no of infected persons in ecah country
+        int[] count = new int[N]; // stores infected persons count in each country
+        for (int ip : initial) { 
+            // find country & leader of this infected & incr count
+            int par = findParent(ip); 
+            count[par]++;
+        }
+
+        Arrays.sort(initial); // smallest value (infected person) if multiple ans
+        
+        // Now find country in which if infected removed spread stops, also maxPopulated country is best to save always
+        int maxPopulated = 0;
+        int infected = initial[0]; // since atleast 1 infected always exists
+        for (int ip : initial) {
+            int par = findParent(ip);
+            // Only if infected count is 1, since if > 1 then other infected's would've spread
+            if (count[par] == 1 && size[par] > maxPopulated) {
+                maxPopulated = size[par];
+                infected = ip;
+            }
+        }
+        
+        return infected;
+    }
+    
+    private int findParent(int u) {
+        return parent[u] == u ? u : (parent[u] = findParent(parent[u]));
+    }
+
+    /****************************************************************************************************/
+
 }
