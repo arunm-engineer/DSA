@@ -437,5 +437,74 @@ public class bfs_Questions {
     }
 
     /****************************************************************************************************/
+
+    // LC 1376
+    public int numOfMinutes(int n, int headID, int[] manager, int[] informTime) {
+        ArrayList<Edge>[] graph = constructGraph(n, manager, informTime);
+        
+        int totalMinutes = -(int) 1e9;
+        boolean[] visited = new boolean[n];
+        LinkedList<Pair> q = new LinkedList<>();
+        
+        q.add(new Pair(headID, informTime[headID]));
+        visited[headID] = true;
+        while (!q.isEmpty()) {
+            Pair p = q.removeFirst();
+            
+            totalMinutes = Math.max(totalMinutes, p.wsf);
+
+            for(Edge e : graph[p.vtx]) {
+                if (!visited[e.v]) {
+                    visited[e.v] = true;
+                    q.addLast(new Pair(e.v, p.wsf + e.w));
+                }
+            }
+        }
+        
+        return totalMinutes;
+    }
+    
+    private class Pair {
+        int vtx; // nbr
+        int wsf; // minutes
+        
+        public Pair() {}
+        
+        public Pair(int vtx, int wsf) {
+            this.vtx = vtx;
+            this.wsf = wsf;
+        }
+    }
+    
+    private class Edge {
+        int v;
+        int w;
+        
+        public Edge() {}
+        
+        public Edge(int v, int w) {
+            this.v = v;
+            this.w = w;
+        }
+    }
+    
+    private ArrayList<Edge>[] constructGraph(int N, int[] nodes, int[] wts) {
+        ArrayList<Edge>[] graph = new ArrayList[N];
+        for (int i = 0; i < N; i++)
+            graph[i] = new ArrayList<>();
+        
+        for (int i = 0; i < N; i++) {
+            int u = i, v = nodes[i], w = wts[i];
+            if (v == -1)
+                continue;
+            
+            graph[u].add(new Edge(v, w));
+            graph[v].add(new Edge(u, w));
+        }
+        
+        return graph;
+    }
+
+    /****************************************************************************************************/
     
 }
