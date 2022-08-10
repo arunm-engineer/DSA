@@ -360,11 +360,12 @@ public class Algo {
     /****************************************************************************************************/
 
     // Bellman Ford Algorithm (Min cost path event with -ve edges)
+    // VERSION 1
     // If -ve cycle exists, detects and says -ve cycle exists; if no -ve cycle then returns correct answer
     // Works without constructing graph, only edges is enough
     // Each of the edges idx, i.e. ith index says => Atmost using i no. of edges, min wt. to reach the vtx is...
     // TC V(V+E) => (V.V + V.E) => O(V.E) Better complexity than Djikstra
-    public static void bellmanFord(int[][] edges, int N, int src) {
+    public static void bellmanFord_v1(int[][] edges, int N, int src) {
         // N = no. of vertices, we require Vth edge to detect -ve cycle
         int[] prev = new int[N]; // u
         Arrays.fill(prev, (int) 1e9);
@@ -458,6 +459,40 @@ public class Algo {
 
             for (int j = 0; j < N; j++) 
                 prev[j] = curr[j];
+        }
+
+        System.out.println("Negative cycle : " + negativeCycle);
+    }
+
+    // VERSION 2 of writing Bellman Ford
+    // Using single curr arr
+    // Atmost using 'K' edges words does not apply here, since a single index point can get updated more than once in a single iteration
+    // Use this version only 1. If you want to detect -ve cycle 2. Want to find mincost to all vtxs atmost using 'V' edges
+    // If want intermediate state of using 'K' edges, then use VERSION 1
+    public static void bellmanFord_v2(int[][] edges, int N, int src) {
+        int[] curr = new int[N]; // v
+        Arrays.fill(curr, (int) 1e9);
+
+        curr[src] = 0;
+        
+        boolean negativeCycle = false;
+
+        for (int i = 1; i <= N; i++) {
+            boolean anyUpdate = false;
+
+            for (int[] e : edges) {
+                int u = e[0], v = e[1], w = e[2];
+                if (curr[u] != (int) 1e9 && curr[u] + w < curr[v]) {
+                    curr[v] = curr[u] + w;
+                    anyUpdate = true;
+
+                    if (i == N)
+                        negativeCycle = true;
+                }
+            }
+
+            if (!anyUpdate) // means no update further as well
+                break;
         }
 
         System.out.println("Negative cycle : " + negativeCycle);
