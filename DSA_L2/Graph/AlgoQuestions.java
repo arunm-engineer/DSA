@@ -409,4 +409,54 @@ public class AlgoQuestions {
 
     /****************************************************************************************************/
 
+    // LC 1334
+    // Floyd Warshall Algo
+    public int findTheCity(int n, int[][] edges, int distanceThreshold) {
+        // relaxation of vtxs & conversion to matrix form graph
+        int[][] mat = new int[n][n]; // finally will store mincost from any vtx to any vtx
+
+        for (int[] a : mat) // if no edges will be infinite wt. by default
+            Arrays.fill(a, (int) 1e9);
+
+        for (int[] e : edges) { // plot edges
+            int u = e[0], v = e[1], w = e[2];
+            mat[u][v] = w;
+            mat[v][u] = w;
+        }
+
+        for(int i = 0; i < n; i++)
+            mat[i][i] = 0; // relaxation
+
+        for (int k = 0; k < n; k++) { // intermediate vtx
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    mat[i][j] = Math.min(mat[i][j], mat[i][k] + mat[k][j]); // infinite case check will be handled
+                }
+            }
+        }
+        
+        // finding smallest nbrs within threshold distance
+        int city = -1;
+        int cityCount = (int) 1e9;
+        for (int i = 0; i < n; i++) {
+            int currVtxCityCount = 0;
+            for (int j = 0; j < n; j++) {
+                if (mat[i][j] <= distanceThreshold)
+                    currVtxCityCount++;
+            }
+            
+            if (currVtxCityCount < cityCount) {
+                cityCount = currVtxCityCount;
+                city = i;
+            }
+            else if (currVtxCityCount == cityCount) {
+                city = Math.max(i, city);
+            }
+        }
+        
+        return city;
+    }
+
+    /****************************************************************************************************/
+
 }

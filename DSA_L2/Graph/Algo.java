@@ -500,4 +500,35 @@ public class Algo {
 
     /****************************************************************************************************/
 
+    // Floyd Warshall Algo
+    // For finding mincost from any vtx to any vtx
+    // Works on both directed & birected & -ve edges
+    // Doesn't work for -ve cycle
+    // TC O(V^3)
+    public static void floydWarshall(int[][] edges, int N) {
+        // relaxation of vtxs & conversion to matrix form graph
+        int[][] mat = new int[N][N]; // finally will store mincost from any vtx to any vtx
+
+        for (int[] a : mat) // if no edges will be infinite wt. by default
+            Arrays.fill(a, (int) 1e9);
+
+        for (int[] e : edges) { // plot edges
+            int u = e[0], v = e[1], w = e[2];
+            mat[u][v] = w; // Directed edge
+        }
+
+        for(int i = 0; i < N; i++)
+            mat[i][i] = 0; // relaxation
+
+        for (int k = 0; k < N; k++) { // intermediate vtx
+            for (int i = 0; i < N; i++) {
+                for (int j = 0; j < N; j++) {
+                    mat[i][j] = Math.min(mat[i][j], mat[i][k] + mat[k][j]); // infinite case check will be handled
+                }
+            }
+        }
+    }
+
+    /****************************************************************************************************/
+
 }
