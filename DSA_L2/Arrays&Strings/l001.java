@@ -512,6 +512,8 @@ public class l001 {
 
     // LC 763
     // Idea of Max chunks to sort an array 2 problem
+    // Need to focus on impact range a char can have
+    // TC O(N) SC constant space
     public List<Integer> partitionLabels(String s) {
         int n = s.length();
         int[] last = new int[26]; // stores last occurence idx of a char
@@ -535,6 +537,63 @@ public class l001 {
         }
         
         return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 915
+    // Idea of Max chunks to sort an array 2 problem
+    // TC O(N) SC O(N)
+    public int partitionDisjoint(int[] nums) {
+        int n = nums.length;
+        int[] right = new int[n]; // stores min from right
+        for (int i = n-1; i >= 0; i--) {
+            if (i == n-1) {
+                right[i] = nums[i];
+                continue;
+            }
+            
+            right[i] = Math.min(nums[i], right[i+1]);
+        }
+        
+        int left = nums[0]; // stores max from left
+        for (int i = 0; i < n; i++) {
+            left = Math.max(left, nums[i]);
+            if (i+1 < n && left <= right[i+1]) {
+                return i+1;
+            }
+        }
+        
+        return -1;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 1329
+    // TC O(mnlog(m))
+    // Why logm, at max PQ can hold min(m,n) elems i.e. total elems in a diagonal
+    public int[][] diagonalSort(int[][] mat) {
+        HashMap<Integer, PriorityQueue<Integer>> map = new HashMap<>(); // <gap, diaElemsOfGap>
+        // Why key is gap, since gap is common & same for the whole diagonal
+        
+        int n = mat.length, m = mat[0].length;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                int gap = i - j;
+                map.putIfAbsent(gap, new PriorityQueue<>());
+                
+                map.get(gap).add(mat[i][j]);
+            }
+        }
+        
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                int gap = i - j;
+                mat[i][j] = map.get(gap).remove();
+            }
+        }
+        
+        return mat;
     }
 
     /****************************************************************************************************/
