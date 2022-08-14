@@ -486,4 +486,57 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // https://www.pepcoding.com/resources/data-structures-and-algorithms-in-java-levelup/arrays-and-strings/range_addition/ojquestion
+    // TC O(m + n) => m = q.len
+    public int[] rangeAddition(int[][] queries, int n) {
+        int[] ans = new int[n];
+        
+        for (int[] q : queries) {
+            int st = q[0], end = q[1], val = q[2];
+            ans[st] += val; // create impact of +val from ith index
+            if (end+1 < n)
+                ans[end+1] += -val; // after j+1 index need to nullify impact of val by -val
+        }
+
+        // find prefix sum which will calc by creating and nullifying impact on ranges
+        int sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum += ans[i];
+            ans[i] = sum;
+        }
+
+        return ans;        
+    }
+
+    /****************************************************************************************************/
+
+    // LC 763
+    // Idea of Max chunks to sort an array 2 problem
+    public List<Integer> partitionLabels(String s) {
+        int n = s.length();
+        int[] last = new int[26]; // stores last occurence idx of a char
+        Arrays.fill(last, -1);
+
+        for (int i = 0; i < n; i++) {
+            int ch = s.charAt(i)-'a';
+            last[ch] = Math.max(i, last[ch]);
+        }
+        
+        List<Integer> ans = new ArrayList<>();
+        int max = -1; // max range for last occurence of a char
+        int prev = -1; // just to track gap i.e. len of chunk
+        for (int i = 0; i < n; i++) {
+            int ch = s.charAt(i)-'a';
+            max = Math.max(max, last[ch]);
+            if (i == max) {
+                ans.add(i-prev); // len of chunk
+                prev = i;
+            }
+        }
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
 }
