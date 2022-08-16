@@ -88,6 +88,42 @@ public class l007_TraversalSet {
 
     /****************************************************************************************************/
 
+    // LC 145
+    public static ArrayList<Integer> morrisPostorderTraversal(TreeNode root) {
+        ArrayList<Integer> ans = new ArrayList<>();
+
+        TreeNode curr = root;
+        while (curr != null) {
+            TreeNode right = curr.right;
+            if (right == null) {
+                ans.add(0, curr.val);
+                curr = curr.left;
+            } else {
+                TreeNode leftMost = getLeftMost(right, curr);
+                if (leftMost.left == null) { // thread form
+                    leftMost.left = curr;
+                    ans.add(0, curr.val);
+                    curr = curr.right;
+                } else { // thread break
+                    leftMost.left = null;
+                    curr = curr.left;
+                }
+            }
+        }
+
+        return ans;
+    }
+
+    public static TreeNode getLeftMost(TreeNode node, TreeNode curr) {
+        while (node.left != null && node.left != curr) {
+            node = node.left;
+        }
+
+        return node;
+    }
+
+    /****************************************************************************************************/
+
     // LC 98
     // Validate BST => Using Inorder Traversal
     // Approach 1 => Recursive Inorder

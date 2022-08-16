@@ -30,7 +30,7 @@ public class l005_ConstructionSet {
 
     /****************************************************************************************************/
 
-    public static TreeNode constructFromInorder(int[] inorder, int si, int ei) {
+    public static TreeNode constructBSTFromInorder(int[] inorder, int si, int ei) {
         if (si > ei)
             return null;
 
@@ -38,8 +38,8 @@ public class l005_ConstructionSet {
         int val = inorder[mid];
         TreeNode root = new TreeNode(val);
 
-        root.left = constructFromInorder(inorder, si, mid-1);
-        root.right = constructFromInorder(inorder, mid+1, ei);
+        root.left = constructBSTFromInorder(inorder, si, mid-1);
+        root.right = constructBSTFromInorder(inorder, mid+1, ei);
 
         return root;
     }

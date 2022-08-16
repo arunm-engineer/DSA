@@ -61,8 +61,5 @@ public class l005_questions {
         
         return dp[K][SR][SC];
     }
-
-    public static void main(String[] args) {
-        
-    }
+    
 }

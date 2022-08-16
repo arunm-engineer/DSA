@@ -590,10 +590,181 @@ public class l001 {
             for (int j = 0; j < m; j++) {
                 int gap = i - j;
                 mat[i][j] = map.get(gap).remove();
-            }
+            }`
         }
         
         return mat;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 41
+    // Testcase - [0,2,2,1,1]
+    // TC O(nlogn) SC O(1)
+    public int firstMissingPositive(int[] nums) {
+        Arrays.sort(nums);
+        
+        int val = 1;
+        int i = 0, n = nums.length;
+        while (i < n) {
+            if (nums[i] <= 0) { // ignore -ve, since we only want first +ve
+                i++;
+                continue;
+            }
+            
+            if (val != nums[i])
+                return val;
+            val++;
+            
+            // Remove duplicates
+            int prev = nums[i];
+            while (i < n && nums[i] == prev)
+                i++;
+        }
+        
+        return val;
+    }
+
+    // TC O(N) SC O(1)
+    // nums to contains values in range of [1,n]
+    // mark and find strategy
+    // Testcase - [4,-8,12,2,-6,6,43,11,0,1,9,3,2,5,8]
+    public int firstMissingPositive(int[] nums) {
+        int n = nums.length;
+        
+        // 1. convert out of range nums to any +ve common out of range num
+        for (int i = 0; i < n; i++) {
+            if (nums[i] <= 0 || nums[i] > n) 
+                nums[i] = n+1; // mark with out of range +ve num
+        }
+        
+        // 2. Mark all in-range nums [1,n] as visited in -ve
+        for (int i = 0; i < n; i++) {
+            int val = Math.abs(nums[i]); // -1 for 0-indexed
+            if (val <= n && nums[val-1] > 0) { // in range & not visited
+                nums[val-1] = -1 * nums[val-1];
+            }
+        }
+        
+        // 3. if any +ve num found, means found 1st +ve
+        for (int i = 0; i < n; i++) {
+            if (nums[i] > 0) // if not visited, means we got 1st +ve
+                return i+1; // +1 for 1-indexed num
+        }
+        
+        return n+1; // all in range nums, next +ve is n+1
+    }
+
+    /****************************************************************************************************/
+
+    // LC 1010
+    // Approach 1
+    // Concept - Sum of pairs divisible by K
+    public int numPairsDivisibleBy60(int[] time) {
+        int k = 60;
+        long[] map = new long[k]; // rem can range from [0, k-1], stores cnt of elems of rem
+        
+        for (int num : time) {
+            int rem = num % k;
+            map[rem]++;
+        }
+        
+        long ans = 0;
+        for (int i = 1; i <= (k-1)/2; i++) { // 'x' can pair with 'k-x' to form % by k
+            ans += (map[i] * map[k-i]);
+        }
+        
+        // '0' rem can pair only with '0' rem
+        long n = map[0];
+        ans += n * (n-1)/2; 
+        
+        if (k%2 == 0) { // k is even, spl case the middle also can only pair with self
+            n = map[k/2];
+            ans += n * (n-1)/2; 
+        }
+        
+        return (int) ans;
+    }
+
+    // Approach 2 - Same technique, just way to calc changes
+    // Same Concept - Sum of pairs divisible by K
+    public int numPairsDivisibleBy60(int[] time) {
+        int k = 60;
+        int[] map = new int[k]; // rem can range from [0, k-1], stores cnt of elems of rem
+        
+        int ans = 0;
+        for (int num : time) {
+            int rem = num % k;
+            
+            if (rem == 0) {
+                ans += map[0]; // since 0 rem can only pair with 0 rem elems to form % by k
+            }
+            else { // at every step we pair up k-x, eventually x will also pair up
+                ans += map[k-rem];
+            }
+            
+            map[rem]++;
+        }
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // https://www.geeksforgeeks.org/minimum-number-platforms-required-railwaybus-station/
+    public static int findPlatform(int arr[], int dep[], int n) {
+        Arrays.sort(arr);
+        Arrays.sort(dep);
+        
+        int trainCount = 0, maxPlatforms = 0; // max trains count will be platforms req.
+        int i = 0, j = 0;
+        while (i < n && j < n) {
+            if (arr[i] <= dep[j]) { // for == case, we req. a platorm at the very moment as well
+                trainCount++; // any of the train arrived
+                i++;
+            }
+            else {
+                trainCount--; // any of the train departed
+                j++;
+            }
+            
+            maxPlatforms = Math.max(maxPlatforms, trainCount);
+        }
+        
+        return maxPlatforms;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 1094
+    public boolean carPooling(int[][] trips, int capacity) {
+        // size as per ques constraint
+        int[] map = new int[1001]; // stores impact of from, to on stops
+        TreeSet<Integer> stops = new TreeSet<>(); // no duplicates, also gives in sorted order
+        
+        for (int[] trip : trips) {
+            int passenger = trip[0], from = trip[1], to = trip[2];
+            
+            // put impact of passengers on the stops
+            map[from] += passenger; // passenger boards
+            stops.add(from);
+            
+            map[to] -= passenger; // passenger leaves
+            stops.add(to);
+        }
+        
+        int currCapacity = 0;
+        for (int stop : stops) {
+            currCapacity += map[stop];
+            if (currCapacity > capacity) {
+                return false;
+            }
+            
+            if (currCapacity < 0) // reset, although ques has valid input
+                currCapacity = 0;
+        }
+        
+        return true;
     }
 
     /****************************************************************************************************/

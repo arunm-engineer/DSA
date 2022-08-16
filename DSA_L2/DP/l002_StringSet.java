@@ -1140,7 +1140,7 @@ public class l002_StringSet {
 
     // LC 140 => Approach 1
     // In this function "wordBreak_001" we have performed the same Word Break-1 (LC
-    // 130) and apply Back Engg on the problem to find the sentences
+    // 139) and apply Back Engg on the problem to find the sentences
     public List<String> wordBreak_001(String s, List<String> wordDict) {
         HashSet<String> set = new HashSet<>(); // To make retrieval faster
         int maxLen = 0;
