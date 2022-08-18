@@ -769,4 +769,47 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // LC 453
+    public int minMoves(int[] nums) {
+        int min = (int) 1e9; // to which elem we want to equal
+        for (int num : nums) {
+            min = Math.min(min, num);
+        }
+        
+        int ans = 0;
+        for (int num : nums) {
+            int gap = num - min; // the gap has to be decr at each step for one elem
+            ans += gap;
+        }
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 881
+    public int numRescueBoats(int[] people, int limit) {
+        Arrays.sort(people);
+        
+        int n = people.length;
+        int i = 0, j = n-1, boatCount = 0;
+        while (i < j) {
+            if (people[i] + people[j] <= limit) {
+                i++;
+                j--;
+            }
+            else {
+                j--;
+            }
+            boatCount++;
+        }
+        
+        if (i == j) // for that one single person when our condition breaks
+            boatCount++;
+        
+        return boatCount;
+    }
+
+    /****************************************************************************************************/
+
 }
