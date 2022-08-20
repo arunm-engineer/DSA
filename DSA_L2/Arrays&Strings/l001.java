@@ -788,6 +788,7 @@ public class l001 {
     /****************************************************************************************************/
 
     // LC 881
+    // Intuition: The best person to fit with most weighted person will be most lightest person
     public int numRescueBoats(int[] people, int limit) {
         Arrays.sort(people);
         
@@ -808,6 +809,59 @@ public class l001 {
             boatCount++;
         
         return boatCount;
+    }
+
+    /****************************************************************************************************/
+
+    // https://practice.geeksforgeeks.org/problems/key-pair5616/1
+    // Target Sum pair approach
+    // Another approach: Using HashMap technique a+b=x, then put elem-x (x-b) in map,
+    // if with another elem (x-a) found in map, means got a pair
+    public boolean hasArrayTwoCandidates(int arr[], int n, int x) {
+        Arrays.sort(arr);
+        
+        int i = 0, j = n-1;
+        while (i < j) {
+            if (arr[i] + arr[j] > x) {
+                j--;
+            }
+            else if (arr[i] + arr[j] < x) {
+                i++;
+            }
+            else {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    /****************************************************************************************************/
+
+    // https://practice.geeksforgeeks.org/problems/find-pair-given-difference1559/1
+    // Target Difference Pair
+    // To get All pairs, this approach won't work, use HashMap technique to find all pairs or count of all pairs
+    public boolean findPair(int arr[], int n, int x)
+    {
+        Arrays.sort(arr);
+        
+        int i = 0, j = 1;
+        while (j < n) {
+            if (arr[j] - arr[i] > x) {
+                i++;
+            }
+            else if (arr[j] - arr[i] < x) {
+                j++;
+            }
+            else {
+                return true;
+            }
+            
+            if (i == j) // beacuse if both at same point, then it's not a pair
+                j++;
+        }
+        
+        return false;
     }
 
     /****************************************************************************************************/
