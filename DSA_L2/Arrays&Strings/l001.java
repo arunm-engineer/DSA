@@ -866,4 +866,146 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // LC Permium - Best Meeting Point
+    // https://www.pepcoding.com/resources/data-structures-and-algorithms-in-java-levelup/arrays-and-strings/best-meeting-point/ojquestion
+    // Median will always be the best meeting point because of the 'Delta' factor for all the persons
+    // So we reduce horizontal motion and vertical motion towards median point
+    public static int minTotalDistance(int[][] grid) {
+        int n = grid.length, m = grid[0].length;
+
+        List<Integer> cols = new ArrayList<>(); // Collect elems column wise
+        for (int j = 0; j < m; j++) {
+            for (int i = 0; i < n; i++) {
+                if (grid[i][j] == 1) 
+                    cols.add(j);
+            }
+        }
+
+        List<Integer> rows = new ArrayList<>(); // Collect elems row wise
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid[i][j] == 1) 
+                    rows.add(i);
+            }
+        }
+
+        int medianCol = cols.get(cols.size()/2);
+        int medianRow = rows.get(rows.size()/2);
+
+        int distanceCol = 0, distanceRow = 0; // find distance from median points for all persons
+
+        for (int i = 0; i < cols.size(); i++) {
+            int gap = Math.abs(cols.get(i) - medianCol);
+            distanceCol += gap;
+        }
+        for (int i = 0; i < rows.size(); i++) {
+            int gap = Math.abs(rows.get(i) - medianRow);
+            distanceRow += gap;
+        }
+
+        int totalDistance = distanceRow + distanceCol; // total distance all 1s have to travel towards median (best meeting point)
+        return totalDistance;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 763
+    public List<Integer> partitionLabels(String s) {
+        int n = s.length();
+        int[] last = new int[26]; // stores last occurence idx of a char
+        Arrays.fill(last, -1);
+
+        for (int i = 0; i < n; i++) {
+            int ch = s.charAt(i)-'a';
+            last[ch] = Math.max(i, last[ch]);
+        }
+        
+        List<Integer> ans = new ArrayList<>();
+        
+        // max keeps the farthest buffer range idx, any char can go (basically range)
+        int max = -1;
+        int prev = -1; // just to find gap i.e. len of chunk
+        for (int i = 0; i < n; i++) {
+            int ch = s.charAt(i)-'a';
+            max = Math.max(max, last[ch]);
+            if (i == max) { // if we've reached a boundary of a range part
+                ans.add(i-prev);
+                prev = i;
+            }
+        }
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 915
+    // TC O(N) SC O(N)
+    public int partitionDisjoint(int[] nums) {
+        int n = nums.length;
+        int[] right = new int[n]; // stores min from right
+        for (int i = n-1; i >= 0; i--) {
+            if (i == n-1) {
+                right[i] = nums[i];
+                continue;
+            }
+            
+            right[i] = Math.min(nums[i], right[i+1]);
+        }
+        
+        int left = nums[0]; // stores max from left
+        for (int i = 0; i < n; i++) {
+            left = Math.max(left, nums[i]);
+            if (i+1 < n && left <= right[i+1]) {
+                return i+1;
+            }
+        }
+        
+        return -1;
+    }
+
+    // TC O(N) SC O(1)
+    public int partitionDisjoint(int[] nums) {
+        int n = nums.length;
+        
+        int partitionIndex = 0; // assume initial partition point
+        int maxTillPartition = nums[0];
+        int maxSoFar = nums[0]; // will help set next maxTillPartition, if new partition found
+        
+        for (int i = 0; i < n; i++) {
+            maxSoFar = Math.max(maxSoFar, nums[i]);
+            
+            if (nums[i] < maxTillPartition) { // means new partition point found, extend partition
+                partitionIndex = i;
+                maxTillPartition = maxSoFar;
+            }
+        }
+        
+        return partitionIndex+1;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 754
+    // https://www.geeksforgeeks.org/find-the-number-of-jumps-to-reach-x-in-the-number-line-from-zero/
+    public int reachNumber(int target) {
+        target = Math.abs(target);
+        
+        int n = 1; // moves
+
+        // use n*(n+1)/2 formula to find range
+        while (true) {
+            int range = n*(n+1) / 2;
+            // target within range and target, range should be same odd based or even based
+            if (range >= target && target%2 == range%2) { 
+                break;
+            }
+            n++;
+        }
+        
+        return n;
+    }
+
+    /****************************************************************************************************/
+
 }
