@@ -1008,4 +1008,72 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // LC 838
+    // TC O(n)
+    // Correct code and approach, but TLE on Leetcode, although this is the optimised approach
+    // Go with this approach in interview also, no issues
+    public String pushDominoes(String dominoes) {
+        // add L, R at both ends to use prev, curr logic easily
+        dominoes = "L" + dominoes + "R";
+        
+        char[] arr = dominoes.toCharArray();
+        
+        // evaluate
+        int prev = 0, curr = -1;
+        for (int i = 1; i < dominoes.length(); i++) {
+            if (arr[i] == '.')
+                continue;
+            
+            curr = i;
+            // cases for motion of dominoes
+            if (arr[prev] == 'L' && arr[curr] == 'L') { // do left
+                for (int j = prev+1; j < curr; j++) 
+                    arr[j] = 'L';
+            }
+            else if (arr[prev] == 'L' && arr[curr] == 'R') { // do nothing
+                
+            }
+            else if (arr[prev] == 'R' && arr[curr] == 'R') { // do right
+                for (int j = prev+1; j < curr; j++) 
+                    arr[j] = 'R';
+            }
+            else if (arr[prev] == 'R' && arr[curr] == 'L') { // meet in the middle
+                int st = prev+1, end = curr-1;
+                while (st < end) {
+                    arr[st++] = 'R';
+                    arr[end--] = 'L';
+                }
+            }
+            
+            prev = curr;
+        }
+        
+        String ans = "";
+        for (int i = 1; i < arr.length-1; i++) // since first & last L,R are just reference pts
+            ans += arr[i];
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 53
+    // Kadane's Algorithm
+    public int maxSubArray(int[] nums) {
+        int max = -(int) 1e9;
+        
+        int sum = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (sum < 0) // kyunki ab nayi train start karna chaiye, warna mujhe bhi kam kardega
+                sum = 0;
+            
+            sum += nums[i]; // agar pichla train +ve tha, toh ussi mein chadna behter hai
+            max = Math.max(max, sum);
+        }
+        
+        return max;
+    }
+
+    /****************************************************************************************************/
+
 }
