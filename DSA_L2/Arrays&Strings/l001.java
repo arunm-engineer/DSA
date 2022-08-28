@@ -1061,7 +1061,7 @@ public class l001 {
     // Kadane's Algorithm
     public int maxSubArray(int[] nums) {
         int max = -(int) 1e9;
-        
+        +
         int sum = 0;
         for (int i = 0; i < nums.length; i++) {
             if (sum < 0) // kyunki ab nayi train start karna chaiye, warna mujhe bhi kam kardega
@@ -1072,6 +1072,69 @@ public class l001 {
         }
         
         return max;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 152
+    // Approach 1 - Thought process based
+    // TC O(n)
+    // The maxProduct will will never exist in center subarr, it can be either covering a prefix Subarr or a suffix subbarr. But never a middle subarr. Refer notes for such cases.
+    // Basically it is bcoz of the cases of +ve & -ve combinations
+    // Everytime we can combine middle subarr on either sides or incl both sides to get max product
+    public int maxProduct(int[] nums) {
+        int max = -(int) 1e9;
+        
+        // Get max product from "Prefix" direction
+        int product = 1;
+        for (int i = 0; i < nums.length; i++) {
+            product *= nums[i];
+            max = Math.max(max, product);
+            
+            // reset product, basically incases of 0 we split subarr as left & right across 0s
+            if (nums[i] == 0) 
+                product = 1;
+        }
+        
+        // Get max product from "Suffix" direction
+        product = 1;
+        for (int i = nums.length-1; i >= 0; i--) {
+            product *= nums[i];
+            max = Math.max(max, product);
+            
+            // reset product, basically incases of 0 we split subarr as left & right across 0s
+            if (nums[i] == 0) 
+                product = 1;
+        }
+        
+        return max;
+    }
+
+    // Approach 2 - Kadane's Algo based
+    // TC O(n)
+    public int maxProduct(int[] nums) {
+        // We need to maintain min as well, since we've -ve nums, we have few cases
+        // (min * -ve) can become max, also (max * -ve) can become min
+        // Thereby we have possibilities so need to consider all cases, eg: [-2, 5, -3]
+        int max = nums[0];
+        int min = nums[0];
+
+        int ans = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] >= 0) { // +ve case, then obviously max*+ve for max & min*+ve for min
+                max = Math.max(max * nums[i], nums[i]);
+                min = Math.min(min * nums[i], nums[i]);
+            }
+            else { // -ve case, -ve*max can be next min & -ve*min can be next max (possibilities)
+                int temp = max; // store max, since max gets updated
+                max = Math.max(min * nums[i], nums[i]);
+                min = Math.min(temp * nums[i], nums[i]);
+            }
+            
+            ans = Math.max(ans, max);
+        }
+        
+        return ans;
     }
 
     /****************************************************************************************************/
