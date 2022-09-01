@@ -1139,4 +1139,120 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // LC 204
+    // Sieve of Eratosthenes - TC O(nlog(logn)) - No proof, by observation TC O(square_root(n)*n)
+    public int countPrimes(int n) {
+        if (n <= 1) 
+            return 0;
+        
+        boolean[] primes = new boolean[n+1];
+        Arrays.fill(primes, true);
+        
+        primes[0] = primes[1] = false; // 0, 1 are not primes
+        for (int i = 2; i * i <= n; i++) {
+            if (primes[i] == false)
+                continue;
+            
+            // start j from i, since before i values are already used in prev i values
+            // if i=3, then j=3, since 3x2 is already handled in 2x3, so j=i (3 in this case)
+            // Why not 3x1, since any num only divisible by itself or 1 is prime, so 3x1 is prime
+            for (int j = i; i*j <= n; j++) { 
+                primes[i*j] = false; // marking all factors of i, since they can't be prime
+            }
+        }
+        
+        int count = 0;
+        for (int i = 0; i < n; i++)
+            if (primes[i] == true) count++;
+        
+        return count;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 1031
+    // TC O(n)
+    public int maxSumTwoNoOverlap(int[] nums, int firstLen, int secondLen) {
+        int max1 = getMaxWindowSum(nums, firstLen, secondLen);
+        int max2 = getMaxWindowSum(nums, secondLen, firstLen); // also possible len2+len1 window sum
+        int ans = Math.max(max1, max2);
+        return ans;
+    }
+    
+    private int getMaxWindowSum(int[] nums, int len1, int len2) {
+        int n = nums.length;
+        int[] left = new int[n]; // stores max window sum of len1 size ending within 'i'
+        int[] right = new int[n]; // stores max window sum of len2 size starting after 'i+1'
+        
+        // to calc window sum & to store max window sum
+        int sum = 0, max = 0;
+        for (int i = 0; i < n; i++) {
+            if (i <= len1 - 1)
+                sum += nums[i];
+            else  // reduce elem impact before window in curr window sum
+                sum = sum + nums[i] - nums[i-len1];
+            
+            max = Math.max(max, sum);
+            left[i] = max;
+        }
+        
+        sum = 0;
+        max = 0;
+        for (int i = n-1; i >= 0; i--) {
+            if (i >= n - len2)
+                sum += nums[i];
+            else  // reduce elem impact before window in curr window sum
+                sum = sum + nums[i] - nums[i + len2];
+            
+            max = Math.max(max, sum);
+            right[i] = max;
+        }
+        
+        int maxSum = 0;
+        for (int i = len1 - 1; i < n - len2; i++) {
+            maxSum = Math.max(maxSum, left[i] + right[i+1]); // try all non-overlapping combinations
+        }
+        
+        return maxSum;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 42
+    // TC O(n)
+    public int trap(int[] height) {
+        int n = height.length;
+        // stores tallest on left & right side (not immediate left, right, but among all left, right)
+        int[] left = new int[n]; 
+        int[] right = new int[n];
+        
+        for (int i = 0; i < n; i++) {
+            if (i == 0) {
+                left[i] = height[i];
+                continue;
+            }
+            
+            left[i] = Math.max(left[i-1], height[i]);
+        }
+        
+        for (int i = n-1; i >= 0; i--) {
+            if (i == n-1) {
+                right[i] = height[i];
+                continue;
+            }
+            
+            right[i] = Math.max(right[i+1], height[i]);
+        }
+        
+        int water = 0;
+        for (int i = 0; i < n; i++) {
+            int gap = Math.min(left[i], right[i]) - height[i];
+            water += gap;
+        }
+        
+        return water;
+    }
+
+    /****************************************************************************************************/
+
 }
