@@ -1255,4 +1255,129 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // LC 56
+    // TC O(nlogn)
+    public int[][] merge(int[][] intervals) {
+        Arrays.sort(intervals, (a, b) -> {
+            return a[0] - b[0];
+        });
+        
+        Stack<int[]> st = new Stack<>();
+        
+        for (int[] interval : intervals) {
+            int start = interval[0], end = interval[1];
+            if (st.isEmpty()) {
+                st.push(interval);
+            }
+            else {
+                int[] top = st.peek();
+                if (start > top[1]) 
+                    st.push(interval);
+                else 
+                    top[1] = Math.max(end, top[1]);
+            }
+        }
+        
+        int[][] ans = new int[st.size()][2];
+        int i = st.size()-1;
+        while (!st.isEmpty()) {
+            ans[i--] = st.pop();
+        }
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 57
+    // TC O(n)
+    public int[][] insert(int[][] intervals, int[] newInterval) {
+        int n = intervals.length;
+        List<int[]> list = new ArrayList<>();
+        
+        // 1. add intervals which are not part of overlapping inserting interval 
+        int i = 0;
+        while (i < n && intervals[i][1] < newInterval[0]) { // (end < st of inserting)
+            list.add(intervals[i]);
+            i++;
+        }
+        
+        // 2. merge overlapping interval with inserting interval
+        int[] merge = newInterval; // this arr will accumulate all overlapping intervals
+        while (i < n && intervals[i][0] <= merge[1]) { // end of inseting >= start
+            merge[0] = Math.min(intervals[i][0], merge[0]);
+            merge[1] = Math.max(intervals[i][1], merge[1]);
+            i++;
+        }
+        list.add(merge);
+        
+        // 3. add intervals which are not part of overlapping inserting interval 
+        while (i < n) { // (start > end of inserting)
+            list.add(intervals[i]);
+            i++;
+        }
+        
+        int[][] ans = new int[list.size()][2];
+        for (int j = 0; j < list.size(); j++)
+            ans[j] = list.get(j);
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 986
+    // TC O(n+m)
+    // Two-pointer approach
+    public int[][] intervalIntersection(int[][] firstList, int[][] secondList) {
+        int n = firstList.length, m = secondList.length;
+
+        List<int[]> list = new ArrayList<>();
+        int i = 0, j = 0;
+        while (i < n && j < m) {
+            int st1 = firstList[i][0], end1 = firstList[i][1];
+            int st2 = secondList[j][0], end2 = secondList[j][1];
+            
+            int latestSt = Math.max(st1, st2);
+            int earliestEnd = Math.min(end1, end2);
+            
+            if (latestSt <= earliestEnd) { // means latestSt occurs even before earliestEnd ends
+                list.add(new int[]{latestSt, earliestEnd}); // intersection gap [st,end]
+            }
+            
+            if (end1 < end2)  // incr i, so that to cover intersection within end2, if at all occurs
+                i++;
+            else // vice-versa
+                j++;
+        }
+        
+        int[][] ans = new int[list.size()][2];
+        for (int k = 0; k < list.size(); k++) 
+            ans[k] = list.get(k);
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 891
+    // TC O(n)
+    public int sumSubseqWidths(int[] nums) {
+        int m = (int) 1e9+7;
+        int n = nums.length;
+        
+        Arrays.sort(nums); // so that min & max are taken easily for subsq width calc
+        
+        long ans = 0; // adding overall width
+        long x = 1; // represents subsq count
+        for (int i = 0, j = n-1; i < n; i++, j--) {
+            ans = (ans + x*nums[i] - x*nums[j]) % m;
+            x = (x*2) % m;
+        }
+        
+        return (int) ans;
+    }
+
+    /****************************************************************************************************/
+
 }
