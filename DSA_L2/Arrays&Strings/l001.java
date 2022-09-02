@@ -1380,4 +1380,70 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // LC 452
+    // TC O(nlogn)
+    public int findMinArrowShots(int[][] points) {
+        int n = points.length;
+        
+        // Use this type of sort incases of Interger overflow problem, a[0] - b[0] might overflow
+        Arrays.sort(points, (a, b) -> {
+            if (a[0] > b[0]) 
+                return 1;
+            else if (a[0] == b[0])
+                return 0;
+            else 
+                return -1;
+        });
+        
+        int arrows = 1; // represents arrows count, intialize 1 to burst very first balloon
+        int end = points[0][1]; // range within which we can burst more using same arrow (greedy)
+        for (int i = 1; i < n; i++) {
+            int st = points[i][0];
+            if (st > end) {
+                arrows++;
+                end = points[i][1];
+            }
+            else { // min - so that we can burst more using same arrow in min end range
+                end = Math.min(end, points[i][1]); 
+            }
+        }
+        
+        return arrows;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 134
+    // TC O(n)
+    // Greedy - Refer notes for intuition
+    // Overall delta = sum of delta at all stations
+    // Note: No need to loop remaining journey, since overall delta sum is +ve & remaining journey is also part of the same overall delta sum which will be +ve
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        if (sum(gas) < sum(cost)) // no enough gas itself overall to complete journey
+            return -1;
+        
+        int n = gas.length;
+        int total = 0; // this the 'delta' from stations, delta = gas - cost
+        int start = 0; // represents the station to start from to complete journey
+        for (int i = 0; i < n; i++) {
+            total += gas[i] - cost[i];
+            
+            if (total < 0) { // -ve means not enough gas, so start from new station fresh
+                total = 0;
+                start = i+1;
+            }
+        }
+        
+        return start;
+    }
+    
+    private int sum (int[] arr) {
+        int sum = 0;
+        for (int val : arr)
+            sum += val;
+        return sum;
+    }
+
+    /****************************************************************************************************/
+
 }
