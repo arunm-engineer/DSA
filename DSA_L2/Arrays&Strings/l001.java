@@ -1446,4 +1446,183 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // LC 239
+    // Approach 1 - Using Next Greater Element Technique
+    // TC O(n) 
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        int n = nums.length;
+        
+        // 1. Find Next Greater Element
+        int[] nge = new int[n];
+        Stack<Integer> st = new Stack<>();
+        for (int i = 0; i < n; i++) {
+            if (st.isEmpty()) {
+                st.push(i);
+            }
+            else {
+                while (!st.isEmpty() && nums[i] > nums[st.peek()]) { // curr > top => curr is NGE
+                    nge[st.pop()] = i;
+                }
+                st.push(i);
+            }
+        }
+        
+        while (!st.isEmpty()) {
+            nge[st.pop()] = n; // no NGE for these so assign some out of range number
+        }
+        
+        // 2. Find Max in windows
+        int[] ans = new int[n-k+1]; // stores max in windows
+        int j = 0; // indicates max in window
+        for (int i = 0; i < ans.length; i++) {
+            if (j < i) // j cannot be behind (happens when i shifts to a new window)
+                j = i;
+            
+            while (nge[j] <= i+k-1) { // keep moving to NGEs until doesn't get out of window
+                j = nge[j];
+            }
+            
+            // Finally j will stand at point of max in window
+            ans[i] = nums[j];
+        }
+        
+        return ans;
+    }
+
+    // Approach 2 - Using Doubly Ended Queue
+    // TC O(n)
+    // If you notice the Queue always tries to maintain increasing order of elems from reverse 
+    // Thereby first elem will be max in window
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        int n = nums.length;
+        int[] ans = new int[n-k+1]; // stores max in each window of k-size
+        
+        // Deque - Add/remove from both ends of Queue
+        Deque<Integer> q = new LinkedList<>(); // stores indexes to evaluate of max in window
+        // initial fill of k size
+        for (int i = 0; i < k; i++) {
+            while (!q.isEmpty() && nums[i] > nums[q.getLast()]) {
+                q.removeLast();
+            }
+            q.addLast(i);
+        }
+        
+        int j = 0;
+        ans[j++] = nums[q.getFirst()]; // for the first window
+            
+        // for remaining windows
+        for (int i = k; i < n; i++) {
+            // 1. remove prev window elems first
+            while (!q.isEmpty() && q.getFirst() <= i-k) { 
+                q.removeFirst();
+            }
+            
+            // 2. now evaluate for curr window
+            while (!q.isEmpty() && nums[i] > nums[q.getLast()]) { 
+                q.removeLast();
+            }
+            
+            q.addLast(i);
+            ans[j++] = nums[q.getFirst()]; // at first of Queue we'll have the max in window
+        }
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 628
+    // TC O(n)
+    public int maximumProduct(int[] nums) {
+        int min1 = (int) 1e9, min2 = (int) 1e9;
+        int max1 = -(int) 1e9, max2 = -(int) 1e9, max3 = -(int) 1e9;
+        
+        for (int num : nums) {
+            // For min
+            if (num < min1) {
+                min2 = min1;
+                min1 = num;
+            }
+            else if (num < min2) {
+                min2 = num;
+            }
+            
+            // For max
+            if (num > max1) {
+                max3 = max2;
+                max2 = max1;
+                max1 = num;
+            }
+            else if (num > max2) {
+                max3 = max2;
+                max2 = num;
+            }
+            else if (num > max3) {
+                max3 = num;
+            }
+        }
+        
+        int case1 = min1 * min2 * max1; // If -ve present, min1*min2 becomes +ve, then with max1
+        int case2 = max1 * max2 * max3; // Obvious case xply all max nums
+        
+        int ans = Math.max(case1, case2); // Probability of max in both cases
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 1004
+    // TC O(n)
+    public int longestOnes(int[] nums, int k) {
+        int n = nums.length;
+        
+        int ans = -(int) 1e9;
+        
+        int zeroes = 0; // 0's count
+        int j = 0; // points to start of window, where 0s count is atmost k, to calc gap, flipping 0s
+        for (int i = 0; i < n; i++) {
+            if (nums[i] == 0)
+                zeroes++;
+            
+            while (zeroes > k) { // (Invalid zone) 0s count > k, then get 0s count within k
+                if (nums[j] == 0)
+                    zeroes--;
+                j++;
+            }
+            
+            // coming at this line means, (Valid zone) 0s count <= k, so calc gap, assuming you flipped 0s
+            // Even if 0s count is less we can get ans, Testcase - arr=[0,0,0,1], k=4
+            ans = Math.max(ans, i-j+1);
+        }
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // https://www.geeksforgeeks.org/find-smallest-number-whose-digits-multiply-given-number-n/
+    // https://practice.geeksforgeeks.org/problems/digit-multiplier3000/1
+    // TC O(logn)
+    public static String getSmallest(Long N) {
+        if (N < 10) // if single digit it itself is smallest number divisible by self
+            return N + "";
+        
+        String ans = "";
+        
+        // Starting from big divisor (9,8,7,..2) since division by big number has big impact contributing to smallest number in ans
+        for (int div = 9; div >= 2; div--) {  
+            while (N % div == 0) { // while N is divisible by divisor
+                N = N/div;
+                ans = div + ans;
+            }
+        }
+        
+        if (N >= 10) // means N is double digit & couldn't divide that N by any divisor, so no ans
+            return "-1";
+            
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
 }
