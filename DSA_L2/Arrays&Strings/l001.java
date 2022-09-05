@@ -1625,4 +1625,27 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // LC 153
+    // TC O(logn)
+    // Observation of pattern needed, refer notes
+    public int findMin(int[] nums) {
+        int n = nums.length;
+        
+        // We use this type of binary serach method, since we want to make only 2 partitions, i.e. "including" mid in any one partition and not excluding like we do in mid+1 or mid-2
+        int lo = 0, hi = n-1;
+        while (lo < hi) {
+            int mid = (hi-lo)/2 + lo;
+            
+            // all big on right, then go left to find smallest elem
+            if (nums[hi] > nums[mid]) 
+                hi = mid;
+            else // right side has small elems, so go right
+                lo = mid+1;
+        }
+        
+        return nums[lo];
+    }
+
+    /****************************************************************************************************/
+
 }
