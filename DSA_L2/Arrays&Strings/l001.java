@@ -1648,4 +1648,37 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // LC 1283
+    // TC O(nlogn)
+    public int smallestDivisor(int[] nums, int threshold) {
+        // since a divisor will lie btw min & max of arr to get close to threshold value
+        int lo = 1, hi = 1; // default values from constraint
+        for (int num : nums) {
+            lo = Math.min(lo, num);
+            hi = Math.max(hi, num);
+        }
+        
+        // 2 partition based binary search
+        while (lo < hi) { // TC O(logn)
+            int mid = (hi-lo)/2 + lo;
+            
+            int sum = 0;
+            int div = mid; // mid is your divisor in the range of lo & hi of arr
+            for (int num : nums) { // TC O(n)
+                // for ceil value of quotient (or) Math.ceil(num*1.0/div)
+                int quo = (num + div - 1) / div;
+                sum += quo;
+            }
+            
+            if (sum > threshold) 
+                lo = mid+1; // when divisor incr, thereby quotient decr, sum will also decr
+            else // when divisor decr, thereby quotient will incr, sum will also incr
+                hi = mid;
+        }
+        
+        return lo;
+    }
+
+    /****************************************************************************************************/
+
 }
