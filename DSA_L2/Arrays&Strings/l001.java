@@ -1681,4 +1681,143 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // https://practice.geeksforgeeks.org/problems/chocolate-distribution-problem3825/1
+    // TC O(nlogn)
+    public long findMinDiff (ArrayList<Integer> a, int n, int m) {
+        Collections.sort(a);
+        
+        int minDiff = (int) 1e9;
+        for (int i = 0; i <= n-m; i++) {
+            minDiff = Math.min(minDiff, a.get(i+m-1) - a.get(i)); // Get min diff from each window's start, end
+        }
+        
+        return minDiff;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 410
+    // TC O(nlogn)
+    public int splitArray(int[] nums, int m) {
+        int hi = 0; // max sum a partition is allowed (sum of all elems)
+        int lo = 0; // min sum a partition is allowed 
+        // (why max for lo? let's say a single partition of one elem & that one elem itself might be so big than the limit, max sum allowed in a partition itself, max ensures that all partitions will have atleast min sum in a partition allowed) [Testcase: nums=[1,4,4] m=3]
+        
+        for (int num : nums) {
+            hi += num;
+            lo = Math.max(lo, num);
+        }
+        
+        // Binary search - 2 partitions logic
+        while (lo < hi) { // O(logn)
+            // this mid(limit) is nothing but max sum a partition is allowed to have
+            int mid = (hi-lo)/2 + lo; 
+            int limit = mid;
+            
+            int countOfPartitions = 1; // By default all elems are a single partition
+            int currPartitionSum = 0; // sum of the curr partition
+            
+            for (int num : nums) { // O(n)
+                if (currPartitionSum + num <= limit) { // sum within max sum allowed, accumulate
+                    currPartitionSum += num;
+                }
+                else { // sum overflow max sum allowed in a partition, so make a parition
+                    currPartitionSum = num; // starting a new partition
+                    countOfPartitions++;
+                }
+            }
+            
+            // (if) partitions more than 'm', limit sum is small, obvious to increase limit sum to accumulate more partitions within 'm'
+            // (else) partitions within 'm', means good, let's minizme limit sum little more to see if we get much better partitions
+            if (countOfPartitions > m) {
+                lo = mid + 1; // go right
+            }
+            else { 
+                hi = mid; // go left
+            }
+        }
+        
+        return lo; // eventually lo, hi will be at same point doesn't matter return anything
+    }
+
+    /****************************************************************************************************/
+
+    // LC 1011
+    // Same Ditto copy of above problem approach [LC 410]
+    // TC O(nlogn)
+    public int shipWithinDays(int[] weights, int days) {
+        int lo = 0;
+        int hi = 0;
+        
+        for (int weight : weights) {
+            hi += weight;
+            lo = Math.max(lo, weight);
+        }
+        
+        // Binary Search - 2 partitions logic
+        while (lo < hi) { // O(logn)
+            int mid = (hi-lo)/2 + lo;
+            int limit = mid;
+            
+            int countOfDays = 1;
+            int currPackagesWeight = 0;
+            
+            for (int weight : weights) { // O(n)
+                if (currPackagesWeight + weight <= limit) {
+                    currPackagesWeight += weight;
+                }
+                else {
+                    currPackagesWeight = weight;
+                    countOfDays++;
+                }
+            }
+            
+            if (countOfDays > days) {
+                lo = mid + 1;
+            }
+            else {
+                hi = mid;
+            }
+        }
+        
+        return lo;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 875
+    // Same Ditto copy of above problem approach [LC 1283]
+    // TC O(nlogn)
+    public int minEatingSpeed(int[] piles, int h) {
+        int lo = 1;
+        int hi = 1;
+        
+        for (int pile : piles) {
+            hi = Math.max(hi, pile);
+        }
+        
+        // Binary Search - 2 partitions logic
+        while (lo < hi) {
+            int mid = (hi-lo)/2 + lo;
+            int speed = mid; // k
+            
+            int totalHours = 0;
+            for (int pile : piles) {
+                int time = (pile+speed-1) / speed; // Time(hrs) to eat that pile in k-speed
+                totalHours += time;
+            }
+            
+            if (totalHours > h) { // time high, speed low, increase speed
+                lo = mid + 1;
+            }
+            else { // time low(good), try to minimize for much better if much better k-speed
+                hi = mid;
+            }
+        }
+        
+        return lo;
+    }
+
+    /****************************************************************************************************/
+
 }
