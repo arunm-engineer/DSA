@@ -1649,7 +1649,7 @@ public class l001 {
     /****************************************************************************************************/
 
     // LC 1283
-    // TC O(nlogn)
+    // TC O(nlogm), m - max of arr elems
     public int smallestDivisor(int[] nums, int threshold) {
         // since a divisor will lie btw min & max of arr to get close to threshold value
         int lo = 1, hi = 1; // default values from constraint
@@ -1697,7 +1697,7 @@ public class l001 {
     /****************************************************************************************************/
 
     // LC 410
-    // TC O(nlogn)
+    // TC O(nlogm), m - sum of all arr elems
     public int splitArray(int[] nums, int m) {
         int hi = 0; // max sum a partition is allowed (sum of all elems)
         int lo = 0; // min sum a partition is allowed 
@@ -1744,7 +1744,7 @@ public class l001 {
 
     // LC 1011
     // Same Ditto copy of above problem approach [LC 410]
-    // TC O(nlogn)
+    // TC O(nlogm), m - sum of all arr elems
     public int shipWithinDays(int[] weights, int days) {
         int lo = 0;
         int hi = 0;
@@ -1787,7 +1787,7 @@ public class l001 {
 
     // LC 875
     // Same Ditto copy of above problem approach [LC 1283]
-    // TC O(nlogn)
+    // TC O(nlogm), m - max of arr
     public int minEatingSpeed(int[] piles, int h) {
         int lo = 1;
         int hi = 1;
@@ -1807,10 +1807,53 @@ public class l001 {
                 totalHours += time;
             }
             
-            if (totalHours > h) { // time high, speed low, increase speed
+            if (totalHours > h) { // took more time, means speed is low, so increase speed
                 lo = mid + 1;
             }
-            else { // time low(good), try to minimize for much better if much better k-speed
+            else { // less time(good), try to minimize if much better k-speed
+                hi = mid;
+            }
+        }
+        
+        return lo;
+    }
+
+    /****************************************************************************************************/
+
+    // https://practice.geeksforgeeks.org/problems/the-painters-partition-problem1535/1
+    // https://www.interviewbit.com/problems/painters-partition-problem/#
+    // Same Ditto copy of above problems approach [LC 410, LC 1011]
+    // TC O(nlogm), m - sum of all arr elems
+    public static long minTime(int[] arr,int n,int k){
+        long lo = 0; // lowest time allowed to paint all boards (think if we had only n painters)
+        long hi = 0; // highest time allowed to paint all boards (think if we had only 1 painter)
+        
+        for (int num : arr) {
+            hi += num;
+            lo = Math.max(lo, num);
+        }
+        
+        // Binary Search - 2 partitions logic
+        while (lo < hi) {
+            long mid = (hi-lo)/2 + lo;
+            long limit = mid;
+            
+            long countOfPainters = 1; // By default, 1 painter can try to paint all boards if all within limit
+            long currBoardsSum = 0;
+            for (int num : arr) {
+                if (currBoardsSum + num <= limit) {
+                    currBoardsSum += num;
+                }
+                else {
+                    currBoardsSum = num;
+                    countOfPainters++;
+                }
+            }
+            
+            if (countOfPainters > k) { // more painters used, means took less time, now incr time to reduce painters(let painter's take more time to paint)
+                lo = mid + 1;
+            }
+            else { // less painters used(good), try to minimize for if with much better time the painters can paint
                 hi = mid;
             }
         }
