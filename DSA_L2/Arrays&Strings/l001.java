@@ -1772,6 +1772,11 @@ public class l001 {
                 }
             }
             
+            // Actually 3 conditions only, but last 2 conditions contributes the same action
+            // ">" - if more days, increase weight
+            // "<" - if less days, decrease weight
+            // "=" - if exact days(good), decrease weight (try to minimize for much better weight)
+
             if (countOfDays > days) {
                 lo = mid + 1;
             }
@@ -1840,6 +1845,7 @@ public class l001 {
             
             long countOfPainters = 1; // By default, 1 painter can try to paint all boards if all within limit
             long currBoardsSum = 0;
+
             for (int num : arr) {
                 if (currBoardsSum + num <= limit) {
                     currBoardsSum += num;
@@ -1854,6 +1860,90 @@ public class l001 {
                 lo = mid + 1;
             }
             else { // less painters used(good), try to minimize for if with much better time the painters can paint
+                hi = mid;
+            }
+        }
+        
+        return lo;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 1760
+    // Same Ditto copy of above problem approach [LC 1283, LC 875]
+    // TC O(nlogm), m - max of arr elems
+    public int minimumSize(int[] nums, int maxOperations) {
+        int lo = 1; // lowest allowed balls in a bag
+        int hi = 1; // highest allowed balls in a bag
+        
+        for (int balls : nums) {
+            hi = Math.max(hi, balls);
+        }
+        
+        // Binary Search - 2 partitions logic
+        while (lo < hi) {
+            int mid = (hi-lo)/2 + lo;
+            int limit = mid; // max limit of no. of balls in a bag
+            
+            int operations = 0;
+            for (int balls : nums) {
+                int remainingBalls = balls - limit; // since we only make operations for excess balls which doesn't fit in bags limit size
+                // calc operations to split (divide) balls into req. bags of limit size
+                operations += (remainingBalls+limit-1)/limit; // ceil value (or) ceil(remBalls/limit)
+            }
+            
+            // more operations, means less limit, so increase limit of bag size for more balls
+            if (operations > maxOperations) {
+                lo = mid + 1;
+            }
+            else { // less operations (good), try minimizing for more better limit size of bags
+                hi = mid;
+            }
+        }
+        
+        return lo;
+    }
+    
+    /****************************************************************************************************/
+
+    // https://www.interviewbit.com/problems/allocate-books/
+    // [For submission] - https://practice.geeksforgeeks.org/problems/allocate-minimum-number-of-pages0937/1
+    // Same Ditto copy of above problems approach [LC 410, LC 1011, Painters Partition(GFG)]
+    // TC O(nlogm), m - sum of all elems of arr
+    public static int findPages(int[]A,int N,int M) {
+        // if students are more than books, invalid, since all student needs to be allocated atleast 1 book
+        if (M > N) 
+            return -1;
+            
+        int lo = 1; // lowest num of pages which could be allocated
+        int hi = 1; // highest num of pages which could be allocated
+        
+        for (int pages : A) {
+            hi += pages;
+            lo = Math.max(lo, pages); // since "lo" should be able to accumulate even only a single book having highest num of pages
+        }
+        
+        while (lo < hi) {
+            int mid = (hi-lo)/2 + lo;
+            int limit = mid; // max num of pages which can be allocated to a student
+            
+            int countOfStudents = 1;
+            int currPagesSum = 0;
+            
+            for (int pages : A) {
+                if (currPagesSum + pages <= limit) {
+                    currPagesSum += pages;
+                }
+                else {
+                    currPagesSum = pages;
+                    countOfStudents++;
+                }
+            }
+            
+            if (countOfStudents > M) {
+                lo = mid + 1;
+            }
+            else {
                 hi = mid;
             }
         }
