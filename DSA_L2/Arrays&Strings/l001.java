@@ -866,7 +866,7 @@ public class l001 {
 
     /****************************************************************************************************/
 
-    // LC Permium - Best Meeting Point
+    // LC Premium - Best Meeting Point
     // https://www.pepcoding.com/resources/data-structures-and-algorithms-in-java-levelup/arrays-and-strings/best-meeting-point/ojquestion
     // Median will always be the best meeting point because of the 'Delta' factor for all the persons
     // So we reduce horizontal motion and vertical motion towards median point
@@ -1949,6 +1949,131 @@ public class l001 {
         }
         
         return lo;
+    }
+
+    /****************************************************************************************************/
+
+    // https://practice.geeksforgeeks.org/problems/inversion-of-array-1587115620/1
+    // Using Merge Sort trick - Why works? Since we don't care even if re-ordering occurs
+    // We compare "left set with right set" first, then calc count, "only then" we perform reordering
+    // Therefore, this reordering does not have impact on count in giving wrong ans, we always a left set with a right set of elems for the first them and then reorder for sort
+    // "Ascending sort" here ensures that, if (left elem > right elem) -> then etire left set of elems will be greater than the right elem
+    // left=[6,7,8] right=[2,3,4,5]
+    // By merge sort, the comparison of elems happens with one entity of elems(left) with other entity of elems(right), these entities haven't been compared before,
+    // and then futher merging forms a new set of entity to compare with other new set of entity which has not been overlapped(compared) before
+    // TC O(nlogn)
+    long count = 0;
+    public long inversionCount(long arr[], long N) {
+        long[] sorted = mergeSort(arr, 0, arr.length-1);
+        return count;
+    }
+    
+    private long[] mergeSort(long[] arr, int lo, int hi) {
+        if (lo == hi) {
+            return new long[]{arr[lo]};
+        }
+        
+        int mid = (hi-lo)/2 + lo;
+        
+        long[] left = mergeSort(arr, lo, mid);
+        long[] right = mergeSort(arr, mid+1, hi);
+        long[] merged = merge(left, right);
+        return merged;
+    }
+    
+    private long[] merge(long[] left, long[] right) {
+        int i = 0, j = 0, k = 0;
+        long[] ans = new long[left.length + right.length];
+        
+        while (i < left.length && j < right.length) {
+            if (left[i] <= right[j]) {
+                ans[k++] = left[i++];
+            }
+            else {
+                count += left.length-i; // in this case nums from i to end of left, all will be greater than right[j]
+                ans[k++] = right[j++];
+            }
+        }
+        
+        while (i < left.length) {
+            ans[k++] = left[i++];
+        }
+        while (j < right.length) {
+            ans[k++] = right[j++];
+        }
+        
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 315
+    // Concept like above problem [Count Inversions (GFG)]
+    // Here we do Descending Sort, this will ensure if an elem of left set is greater than elem of right set, 
+    // means all elems of right set from j to end will ge smaller than left elem
+    // left=[8,7,6] right=[4,3,2,1]
+    // TC O(nlogn)
+    public List<Integer> countSmaller(int[] nums) {
+        int n = nums.length;
+        Pair[] pairs = new Pair[n]; // this is to maintain idx with num, since sort reorders nums
+        for (int i = 0; i < n; i++) {
+            pairs[i] = new Pair(nums[i], i);
+        }
+
+        int[] ans = new int[n]; // track count of smaller elems than self
+        mergeSort(pairs, 0, n-1, ans);
+        
+        List<Integer> list = new ArrayList<>();
+        for (int cnt : ans) list.add(cnt);
+        return list;
+    }
+    
+    private class Pair {
+        int num;
+        int idx;
+        
+        public Pair(int num, int idx) {
+            this.num = num;
+            this.idx = idx;
+        }
+    }
+    
+    private Pair[] mergeSort(Pair[] arr, int lo, int hi, int[] ans) {
+        if (lo == hi) {
+            return new Pair[]{arr[lo]};
+        }
+        
+        int mid = (hi-lo)/2 + lo;
+        
+        Pair[] left = mergeSort(arr, lo, mid, ans);
+        Pair[] right = mergeSort(arr, mid+1, hi, ans);
+        Pair[] merged = merge(left, right, ans);
+        return merged;
+    }
+    
+    private Pair[] merge(Pair[] left, Pair[] right, int[] ans) {
+        int i = 0, j = 0, k = 0;
+        Pair[] arr = new Pair[left.length + right.length];
+        
+        while (i < left.length && j < right.length) {
+            if (left[i].num > right[j].num) {
+                // in this case nums from j to end of right, all will be smaller than left[i]
+                ans[left[i].idx] += (right.length-j);
+                arr[k++] = left[i++];
+            }
+            else {
+                arr[k++] = right[j++];
+            }
+        }
+        
+        while (i < left.length) {
+            arr[k++] = left[i++];
+        }
+        while (j < right.length) {
+            arr[k++] = right[j++];
+        }
+        
+        return arr;
     }
 
     /****************************************************************************************************/
