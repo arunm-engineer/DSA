@@ -2078,4 +2078,45 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // LC 378
+    // TC O((m+n)logn) // here assume n is the highest elem of mat
+    // NOTE: Mid using (lo+hi)/2 will fail for -ve values of lo, hi (infinite loop), since above formula cannot divide two partitions, eg: lo = -5, hi = -4
+    public int kthSmallest(int[][] matrix, int k) {
+        int n = matrix.length, m = matrix[0].length;
+        
+        int lo = matrix[0][0];
+        int hi = matrix[n-1][m-1];
+        
+        int required = k; // represents we need atleast k elems to find kth smallest
+        
+        // Binary Search - 2 partitions logic
+        while (lo < hi) { // O(logn)
+            int mid = (hi-lo)/2 + lo; // assume this to be your kth smallest elem
+            
+            // count num of elems we get <= mid, <= ensures do we actually have atleast k elems for kth smallest i.e. mid here
+            // complexity to search elems <= mid, O(m+n), since we're not checking all elems of mat O(n*m)
+            int actual = 0;
+            for (int row = 0; row < n; row++) {
+                int col = n-1; // we start from top right
+                while (col >= 0 && matrix[row][col] > mid) { // if big nums, keep moving left in col
+                    col--;
+                }
+                actual += (col+1); // at this point means all elems in left are small than mid, then check for next row
+            }
+            
+            // (if) within mid, we got less elems than req., to get more actual elems, incr mid
+            // (else) got elems more than req. (good), let's try for more better, get closer to req.
+            if (actual < required) {
+                lo = mid + 1;
+            }
+            else { 
+                hi = mid;
+            }
+        }
+        
+        return lo;
+    }
+
+    /****************************************************************************************************/
+
 }
