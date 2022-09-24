@@ -2081,6 +2081,7 @@ public class l001 {
     // LC 378
     // TC O((m+n)logn) // here assume n is the highest elem of mat
     // NOTE: Mid using (lo+hi)/2 will fail for -ve values of lo, hi (infinite loop), since above formula cannot divide two partitions, eg: lo = -5, hi = -4
+    // Another solution is Priority Queue - But Space SC used, and Time TC are more. Above approach runs logn(m+n). Actually we only take logn operations on while, whereas PQ will O(nlogk)
     public int kthSmallest(int[][] matrix, int k) {
         int n = matrix.length, m = matrix[0].length;
         
@@ -2093,15 +2094,17 @@ public class l001 {
         while (lo < hi) { // O(logn)
             int mid = (hi-lo)/2 + lo; // assume this to be your kth smallest elem
             
-            // count num of elems we get <= mid, <= ensures do we actually have atleast k elems for kth smallest i.e. mid here
-            // complexity to search elems <= mid, O(m+n), since we're not checking all elems of mat O(n*m)
+            // count num of elems we get <= mid, 
+            // <= ensures do we actually have atleast k elems for kth smallest i.e. mid here
+            // complexity to search elems <= mid, O(m+n),
+            // since we're not checking all elems of mat which is O(n*m)
             int actual = 0;
-            for (int row = 0; row < n; row++) {
-                int col = n-1; // we start from top right
-                while (col >= 0 && matrix[row][col] > mid) { // if big nums, keep moving left in col
-                    col--;
+            int col = n-1; // we start from top right
+            for (int i = 0; i < n; i++) {
+                while (j >= 0 && matrix[i][j] > mid) { // if big nums, keep moving left in col
+                    j--;
                 }
-                actual += (col+1); // at this point means all elems in left are small than mid, then check for next row
+                actual += (j+1); // at this point means all elems in left are small than mid, then check for next row
             }
             
             // (if) within mid, we got less elems than req., to get more actual elems, incr mid
@@ -2115,6 +2118,137 @@ public class l001 {
         }
         
         return lo;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 668
+    // Same Ditto copy of above problem approach [LC 378]
+    // NOTE: We're operating on matrix on basis of '1-indexed'
+    public int findKthNumber(int n, int m, int k) {
+        int lo = 1;
+        int hi = n*m;
+        
+        int required = k; // represents we need atleast k elems to find kth smallest
+        
+        // Binary Search - 2 partitions logic
+        while (lo < hi) { // O(logn)
+            int mid = (hi-lo)/2 + lo; // assume this to be your kth smallest elem
+            
+            int actual = 0;
+            int j = m;
+            for (int i = 1; i <= n; i++) {
+                while (j >= 1 && i*j > mid) { 
+                    j--;
+                }
+                actual += j; 
+            }
+            
+            if (actual < required) {
+                lo = mid + 1;
+            }
+            else { 
+                hi = mid;
+            }
+        }
+        
+        return lo;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 719
+    // Same Ditto copy of above problems approach [LC 378, LC 668]
+    // TC O(nlogn)
+    public int smallestDistancePair(int[] nums, int k) {
+        int n = nums.length;
+        Arrays.sort(nums);
+        
+        // check all pairs, since lo gap can be anywhere in arr eg: arr=[1,5,8,9,12,17]
+        int lo = 0; 
+        for (int i = 0; i < n-1; i++) {
+            lo = Math.min(lo, nums[i+1] - nums[i]);
+        }
+        int hi = nums[n-1] - nums[0]; // Since sorted this will be hi gap
+        
+        int required = k;
+        
+        // Binary Search - 2 partitions logic
+        while (lo < hi) {
+            int mid = (hi-lo)/2 + lo; // assume this to be your kth smallest elem
+            
+            // count of pairs - TC O(n) since every pair gets visited only once
+            int actual = 0;
+            int j = 0;
+            for (int i = 0; i < n; i++) {
+                while (j < n && nums[j] - nums[i] <= mid) { // check pairs incl ith & jth elems
+                    j++;
+                }
+                
+                actual += ((j-1)-i); // count of pairs from i to j-1 incl ith elem in all pairs
+            }
+            
+            if (actual < required) {
+                lo = mid + 1;
+            }
+            else {
+                hi = mid;
+            }
+        }
+        
+        return lo;
+    }
+
+    /****************************************************************************************************/
+
+    // LC 33
+    // TC O(logn)
+    public int search(int[] nums, int target) {
+        // 1. find pivot in rotated sorted arr - Ref: https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/
+        
+        // Binary Search - 2 partitions logic
+        int n = nums.length;
+        int lo = 0, hi = n-1;
+        while (lo < hi) {
+            int mid = (hi-lo)/2 + lo;
+            
+            if (nums[hi] > nums[mid]) {
+                hi = mid;
+            }
+            else {
+                lo = mid+1;
+            }
+        }
+        
+        // 2. Now find tar in both left, right sets of sorted arr w.r.t pivot point
+        // [0,pivot-1] & [pivot,n-1] - both of these arr are sorted in incr order
+        int pivot = lo; 
+        int search1 = binarySearch(nums, 0, pivot-1, target);
+        if (search1 != -1) return search1;
+        
+        int search2 = binarySearch(nums, pivot, n-1, target);
+        return search2;
+    }
+    
+    private int binarySearch(int[] nums, int lo, int hi, int target) {
+        // Binary Search - 3 partitions logic - [lo,mid-1] [mid,mid] [mid+1,hi]
+        int idx = -1;
+        while (lo <= hi) {
+            int mid = (hi-lo)/2 + lo;
+            
+            if (nums[mid] == target) {
+                idx = mid;
+                break;
+            }
+            else if (nums[mid] > target) {
+                hi = mid - 1;
+            }
+            else {
+                lo = mid + 1;
+            }
+        }
+        
+        return idx;
     }
 
     /****************************************************************************************************/
