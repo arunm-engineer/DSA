@@ -459,4 +459,29 @@ public class AlgoQuestions {
 
     /****************************************************************************************************/
 
+    // LC 154 [follow up problem of LC 153]
+    // Worst case TC O(n) (bcoz of duplicates), Avg case TC O(logn)
+    public int findMin(int[] nums) {
+        int n = nums.length;
+        int lo = 0, hi = n-1;
+        
+        while (lo < hi) {
+            int mid = (hi-lo)/2 + lo;
+            
+            if (nums[hi] > nums[mid]) {
+                hi = mid;
+            }
+            else if (nums[hi] < nums[mid]) {
+                lo = mid + 1;
+            }
+            else { // duplicates, equality case, nums[hi] == nums[mid]
+                hi--;
+            }
+        }
+        
+        return nums[lo];
+    }
+
+    /****************************************************************************************************/
+
 }
