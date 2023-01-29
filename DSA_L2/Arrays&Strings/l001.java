@@ -2253,4 +2253,57 @@ public class l001 {
 
     /****************************************************************************************************/
 
+    // Lintcode 903 [LC Premium]
+    // TC O(n)
+    public int[] getModifiedArray(int N, int[][] updates) {
+        int[] ans = new int[N];
+
+        for (int[] update : updates) {
+            int start = update[0], end = update[1], val = update[2];
+            // put the impact at the points
+            ans[start] += val;
+            if (end+1 < N) ans[end+1] -= val;
+        }
+
+        // prefix sum will calc the req impact at every point
+        for (int i = 1; i < N; i++) {
+            ans[i] += ans[i-1];
+        }
+
+        return ans;
+    }
+
+    /****************************************************************************************************/
+
+    // Lintcode 883 [LC Premium]
+    // TC O(n)
+    public int findMaxConsecutiveOnes(int[] nums) {
+        int n = nums.length;
+        int k = 1; // k - atmost zeroes we can hold
+        int maxLen = 0;
+        
+        // Acquire & release strategy
+        // Our logic will work generically even for > 1 zeroes (i.e. 'k' zeroes)
+        int j = 0;
+        int count = 0; // zeroes count
+        for (int i = 0; i < n; i++) {
+            if (nums[i] == 0) 
+                count++;
+
+            // release zeroes to make valid within k zeroes
+            while (j < i && count > k) {
+                if (nums[j] == 0)
+                    count--;
+                j++;
+            }
+
+            int len = i - j + 1;
+            maxLen = Math.max(maxLen, len);
+        }
+
+        return maxLen;
+    }
+
+    /****************************************************************************************************/
+
 }

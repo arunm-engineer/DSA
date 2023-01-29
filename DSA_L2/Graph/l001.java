@@ -175,7 +175,7 @@ public class l001 {
     // SC O(V)
     // Here we mark when we add nbr edges itself, so we'll never add edges of all marked nbrs again because of someother path as we would in above BFS method
     // Edges added in queue will be those which does not form a cycle, since we never add it as we've already marked & then added further edges
-    //  If give N number of vertices V, then num of edges need to be connected to not form a cycle is V-1, if even a single more edge get's connected after V-1 then it would for a cycle
+    // If give N number of vertices V, then num of edges need to be connected to not form a cycle is V-1, if even a single more edge get's connected after V-1 then it would for a cycle
     // NOTE: For cycle detection above BFS method is preferred
     public static void bfs_notForCycle(ArrayList<Edge>[] graph, int src, boolean[] visited) {
         LinkedList<Integer> q = new LinkedList<>();
